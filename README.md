@@ -1,36 +1,39 @@
-# Omar Soubhi — Personal Landing Page
+# Landing Page
 
-Single-file static site. No build step, no dependencies.
+Single-file static site. No build step, no dependencies, no name on the page.
 
 ## Deploy to GitHub Pages
 
-**Option A — user site (recommended):** repo named `<your-username>.github.io` → site lives at `https://<your-username>.github.io`
+**Option A — user site:** repo named `<your-username>.github.io` → site at `https://<your-username>.github.io`
 
-**Option B — project repo:** any repo name → site lives at `https://<your-username>.github.io/<repo-name>`
+**Option B — project repo:** any repo name → site at `https://<your-username>.github.io/<repo-name>`
 
 Steps (either option):
 
 1. Create the repo on GitHub.
-2. Upload `index.html` and this `README.md` (drag-and-drop on github.com works, or use git).
+2. Upload `index.html` and this `README.md`.
 3. Repo → **Settings → Pages** → Source: **Deploy from a branch** → Branch: `main`, folder `/ (root)` → Save.
-4. Wait ~1 minute. Your site is live.
+4. Wait ~1 minute. Live.
+
+Note: option A puts your GitHub username in the URL — if full anonymity matters, use a project repo or a custom domain.
 
 ## Adding projects
 
-Open `index.html` and find the `projects` array in the `<script>` block near the bottom. Each project is one object:
+Open `index.html`, find the `projects` array in the `<script>` block near the bottom. One object per project:
 
 ```js
 {
   title: "My Tool Name",
-  tag: "DATA",                    // short badge: PLANNING, DATA, AUTOMATION, etc.
+  category: "Data",              // mono label shown in the index row
+  year: "2025",
   description: "One or two sentences on the problem it solved.",
-  tech: ["Python", "SQL"],        // shows as pill tags
-  link: "https://..."             // or null to hide the link icon
+  tech: ["Python", "SQL"],       // pill tags inside the expanded row
+  link: "https://..."            // or null to hide the link
 }
 ```
 
-Add, remove, or reorder objects — the grid and the "Tools built" stat update automatically.
+The index table, entry counter, and "tools in service" stat all update automatically.
 
-## Editing everything else
+## Theming
 
-All content is plain HTML in `index.html`. Colors live in the `:root` CSS variables at the top of the `<style>` block — change `--accent` to re-theme the whole page.
+Colors are CSS variables in `:root` at the top of the `<style>` block. `--accent` (currently signal orange `#ff4d00`) drives the whole identity — change one line to re-theme.

@@ -3,573 +3,873 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Omar Soubhi — Planning · Engineering · Data · Consulting</title>
-  <meta name="description" content="Omar Soubhi — engineer and consultant specializing in planning, data analysis, and building practical tools that solve real problems.">
+  <title>Planning · Engineering · Data · Consulting</title>
+  <meta name="description" content="Independent practice across planning, engineering, data analysis, and consulting. Tools built on the job, problems engineered into solutions.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0e14;
-      --bg-alt: #10141d;
-      --surface: #151a26;
-      --border: #232a3a;
-      --text: #e6eaf2;
-      --text-muted: #8b94a7;
-      --accent: #4fd1c5;
-      --accent-dim: rgba(79, 209, 197, 0.12);
-      --mono: 'JetBrains Mono', ui-monospace, monospace;
-      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --paper: #0f0e0c;
+      --paper-raise: #16140f;
+      --ink: #ebe6da;
+      --muted: #8d867a;
+      --accent: #ff4d00;
+      --line: #2c2822;
+      --line-strong: #453f35;
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+      --sans: 'Space Grotesk', -apple-system, sans-serif;
+      --serif: 'Instrument Serif', Georgia, serif;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--paper);
+      color: var(--ink);
       font-family: var(--sans);
-      line-height: 1.6;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    ::selection { background: var(--accent); color: var(--bg); }
-
-    .container {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 0 24px;
+    /* film grain */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    /* ---------- Nav ---------- */
+    ::selection { background: var(--accent); color: var(--paper); }
+
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+    em.serif {
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    /* ================= NAV ================= */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: rgba(11, 14, 20, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--paper) 88%, transparent);
+      backdrop-filter: blur(10px);
     }
 
     .nav-inner {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: space-between;
-      height: 64px;
-    }
-
-    .nav-logo {
+      height: 56px;
       font-family: var(--mono);
-      font-weight: 500;
-      font-size: 15px;
-      color: var(--text);
-      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.06em;
     }
 
-    .nav-logo span { color: var(--accent); }
+    .nav-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .nav-mark .dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      display: inline-block;
+    }
 
     .nav-links {
       display: flex;
-      gap: 32px;
       list-style: none;
+      align-items: stretch;
     }
 
     .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--text); }
-
-    /* ---------- Hero ---------- */
-    header {
-      min-height: 92vh;
       display: flex;
       align-items: center;
+      padding: 0 20px;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      border-left: 1px solid var(--line);
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--paper); background: var(--accent); }
+
+    /* ================= HERO ================= */
+    header {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
       position: relative;
-      overflow: hidden;
-      background:
-        radial-gradient(ellipse 60% 50% at 70% 20%, rgba(79, 209, 197, 0.07), transparent),
-        var(--bg);
+      border-bottom: 1px solid var(--line);
     }
 
-    .hero-grid {
+    /* blueprint field */
+    .field {
       position: absolute;
-      inset: 0;
+      inset: 56px 0 0 0;
       background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 56px 56px;
-      opacity: 0.25;
-      mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent);
-      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent);
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 96px 96px;
+      opacity: 0.5;
     }
 
-    .hero-content { position: relative; }
+    .field::before, .field::after {
+      content: "";
+      position: absolute;
+      background: var(--line-strong);
+    }
+    .field::before { left: 50%; top: 0; bottom: 0; width: 1px; opacity: 0.4; }
+    .field::after { top: 50%; left: 0; right: 0; height: 1px; opacity: 0.4; }
 
-    .hero-eyebrow {
+    /* corner registration marks */
+    .reg {
+      position: absolute;
+      width: 20px; height: 20px;
+      border: 1px solid var(--line-strong);
+      z-index: 2;
+    }
+    .reg::before, .reg::after {
+      content: "";
+      position: absolute;
+      background: var(--accent);
+    }
+    .reg::before { left: 50%; top: -4px; bottom: -4px; width: 1px; }
+    .reg::after { top: 50%; left: -4px; right: -4px; height: 1px; }
+    .reg.tl { top: 76px; left: 24px; }
+    .reg.tr { top: 76px; right: 24px; }
+    .reg.bl { bottom: 24px; left: 24px; }
+    .reg.br { bottom: 24px; right: 24px; }
+
+    .hero-meta {
+      position: absolute;
+      top: 88px;
+      right: 56px;
       font-family: var(--mono);
-      font-size: 14px;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+      line-height: 1.9;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hero-meta .v { color: var(--ink); }
+
+    #coords {
+      position: absolute;
+      font-family: var(--mono);
+      font-size: 10px;
       color: var(--accent);
-      margin-bottom: 20px;
+      pointer-events: none;
+      transform: translate(14px, -50%);
+      white-space: nowrap;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .hero-body {
+      position: relative;
+      z-index: 4;
+      padding-bottom: 0;
+    }
+
+    .hero-kicker {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hero-kicker::before {
+      content: "";
+      width: 40px; height: 1px;
+      background: var(--accent);
     }
 
     h1 {
-      font-size: clamp(2.4rem, 6vw, 4.2rem);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-      margin-bottom: 24px;
-    }
-
-    h1 .muted { color: var(--text-muted); }
-
-    .hero-sub {
-      font-size: 1.15rem;
-      color: var(--text-muted);
-      max-width: 560px;
-      margin-bottom: 40px;
-    }
-
-    .hero-cta {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 28px;
-      border-radius: 8px;
-      font-size: 15px;
+      font-size: clamp(3rem, 9.5vw, 8.2rem);
       font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-    .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-    .btn-ghost {
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* ---------- Sections ---------- */
-    section { padding: 96px 0; }
-
-    section:nth-of-type(even) { background: var(--bg-alt); }
-
-    .section-label {
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--accent);
-      margin-bottom: 12px;
-    }
-
-    h2 {
-      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-    }
-
-    .section-intro {
-      color: var(--text-muted);
-      max-width: 620px;
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
       margin-bottom: 48px;
     }
 
-    /* ---------- Expertise ---------- */
-    .expertise-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 20px;
+    h1 .row { display: block; }
+    h1 .indent { padding-left: clamp(40px, 10vw, 160px); }
+
+    h1 em.serif {
+      text-transform: none;
+      letter-spacing: -0.02em;
+      font-size: 0.95em;
     }
 
-    .expertise-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-      transition: border-color 0.2s, transform 0.2s;
-    }
-
-    .expertise-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-    }
-
-    .expertise-card .icon {
-      width: 42px; height: 42px;
-      border-radius: 9px;
-      background: var(--accent-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 18px;
-      color: var(--accent);
-    }
-
-    .expertise-card h3 {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .expertise-card p {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    /* ---------- Projects ---------- */
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    .project-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      transition: border-color 0.2s, transform 0.2s;
-    }
-
-    .project-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-    }
-
-    .project-top {
+    .hero-foot {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
+      align-items: flex-end;
+      gap: 32px;
+      padding-bottom: 72px;
+      flex-wrap: wrap;
     }
 
-    .project-icon {
+    .hero-sub {
+      max-width: 460px;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .hero-cta {
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      text-decoration: none;
+      border: 1px solid var(--line-strong);
+      padding: 16px 28px;
+      position: relative;
+      transition: all 0.25s;
+      background: var(--paper);
+    }
+
+    .hero-cta:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--paper);
+    }
+
+    /* ================= TICKER ================= */
+    .ticker {
+      border-bottom: 1px solid var(--line);
+      overflow: hidden;
+      padding: 14px 0;
+      background: var(--paper-raise);
+    }
+
+    .ticker-track {
+      display: flex;
+      gap: 0;
+      width: max-content;
+      animation: ticker 28s linear infinite;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .ticker-track span { padding: 0 28px; white-space: nowrap; }
+    .ticker-track b { color: var(--accent); font-weight: 400; }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ================= SECTIONS ================= */
+    section { padding: 110px 0; border-bottom: 1px solid var(--line); position: relative; }
+
+    .sec-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 64px;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .sec-num {
       font-family: var(--mono);
       font-size: 12px;
       color: var(--accent);
-      background: var(--accent-dim);
-      padding: 4px 10px;
-      border-radius: 6px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
-    .project-links a {
-      color: var(--text-muted);
-      margin-left: 12px;
-      transition: color 0.2s;
-    }
-
-    .project-links a:hover { color: var(--accent); }
-
-    .project-card h3 {
-      font-size: 1.1rem;
+    h2 {
+      font-size: clamp(2rem, 5vw, 3.6rem);
       font-weight: 600;
-      margin-bottom: 10px;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      line-height: 1.02;
     }
 
-    .project-card > p {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      flex-grow: 1;
-      margin-bottom: 20px;
+    h2 em.serif { text-transform: none; }
+
+    .sec-note {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
-    .project-tags {
+    /* ================= DISCIPLINES ================= */
+    .disc-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 1.2fr 32px;
+      gap: 24px;
+      align-items: center;
+      padding: 34px 8px;
+      border-top: 1px solid var(--line);
+      position: relative;
+      transition: background 0.25s, padding-left 0.25s;
+      cursor: default;
+    }
+
+    .disc-row:last-child { border-bottom: 1px solid var(--line); }
+
+    .disc-row:hover { background: var(--paper-raise); padding-left: 24px; }
+
+    .disc-num {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+      transition: color 0.25s;
+    }
+
+    .disc-row:hover .disc-num { color: var(--accent); }
+
+    .disc-name {
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .disc-desc {
+      color: var(--muted);
+      font-size: 0.92rem;
+      max-width: 480px;
+    }
+
+    .disc-arrow {
+      font-family: var(--mono);
+      color: var(--line-strong);
+      transition: color 0.25s, transform 0.25s;
+    }
+
+    .disc-row:hover .disc-arrow { color: var(--accent); transform: translateX(4px); }
+
+    /* ================= PROJECTS ================= */
+    .proj-index {
+      border-top: 1px solid var(--line);
+    }
+
+    .proj-row {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .proj-summary {
+      display: grid;
+      grid-template-columns: 70px 1.6fr 1fr 120px 32px;
+      gap: 20px;
+      align-items: center;
+      padding: 26px 8px;
+      cursor: pointer;
+      transition: background 0.2s, padding-left 0.2s;
+      user-select: none;
+    }
+
+    .proj-summary:hover { background: var(--paper-raise); padding-left: 20px; }
+
+    .proj-id {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .proj-title {
+      font-size: clamp(1.05rem, 2.2vw, 1.45rem);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .proj-cat {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .proj-year {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .proj-toggle {
+      font-family: var(--mono);
+      font-size: 16px;
+      color: var(--muted);
+      text-align: center;
+      transition: transform 0.3s, color 0.3s;
+    }
+
+    .proj-row.open .proj-toggle { transform: rotate(45deg); color: var(--accent); }
+
+    .proj-detail {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .proj-detail-inner {
+      padding: 8px 8px 34px calc(70px + 28px);
+      display: flex;
+      gap: 48px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .proj-desc {
+      color: var(--muted);
+      max-width: 520px;
+      font-size: 0.95rem;
+    }
+
+    .proj-side { flex: 1; min-width: 200px; }
+
+    .proj-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      margin-bottom: 18px;
     }
 
     .tag {
       font-family: var(--mono);
-      font-size: 11.5px;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      padding: 3px 10px;
-      border-radius: 20px;
+      font-size: 11px;
+      color: var(--ink);
+      border: 1px solid var(--line-strong);
+      padding: 4px 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
-    /* ---------- About ---------- */
-    .about-layout {
+    .proj-link {
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 2px;
+    }
+
+    .proj-link:hover { color: var(--ink); border-color: var(--ink); }
+
+    /* ================= STATS ================= */
+    .stats {
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 56px;
-      align-items: start;
-    }
-
-    .about-text p {
-      color: var(--text-muted);
-      margin-bottom: 18px;
-    }
-
-    .about-text strong { color: var(--text); font-weight: 600; }
-
-    .stat-list {
-      display: grid;
-      gap: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
     }
 
     .stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px 24px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 44px 36px;
     }
 
     .stat .num {
-      font-family: var(--mono);
-      font-size: 1.6rem;
-      font-weight: 500;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(3rem, 6vw, 5rem);
       color: var(--accent);
+      line-height: 1;
+      display: block;
+      margin-bottom: 12px;
     }
 
-    .stat .label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+    .stat .lbl {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
     }
 
-    /* ---------- Contact ---------- */
-    .contact-box {
-      text-align: center;
-      max-width: 560px;
-      margin: 0 auto;
+    /* ================= APPROACH ================= */
+    .approach {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 72px;
+      align-items: start;
     }
 
-    .contact-box .section-intro { margin: 0 auto 36px; }
+    .pull {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
 
-    /* ---------- Footer ---------- */
+    .pull b { color: var(--accent); font-weight: 400; }
+
+    .approach-text p {
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-size: 0.98rem;
+    }
+
+    .approach-text strong { color: var(--ink); font-weight: 600; }
+
+    /* ================= CONTACT ================= */
+    #contact { text-align: center; padding: 140px 0; }
+
+    .contact-kicker {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .email-link {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.8rem, 6vw, 4.6rem);
+      color: var(--ink);
+      text-decoration: none;
+      position: relative;
+      transition: color 0.25s;
+      letter-spacing: -0.02em;
+      word-break: break-all;
+    }
+
+    .email-link::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 100%;
+      bottom: -6px;
+      height: 2px;
+      background: var(--accent);
+      transition: right 0.4s ease;
+    }
+
+    .email-link:hover { color: var(--accent); }
+    .email-link:hover::after { right: 0; }
+
+    /* ================= FOOTER ================= */
     footer {
-      border-top: 1px solid var(--border);
-      padding: 32px 0;
+      padding: 26px 0;
     }
 
-    .footer-inner {
+    .foot-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      font-size: 13px;
-      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
     }
 
-    .footer-inner a { color: var(--text-muted); text-decoration: none; }
-    .footer-inner a:hover { color: var(--accent); }
+    .foot-inner a { color: var(--muted); text-decoration: none; }
+    .foot-inner a:hover { color: var(--accent); }
 
-    /* ---------- Reveal animation ---------- */
+    /* ================= REVEAL ================= */
     .reveal {
       opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
     }
+    .reveal.visible { opacity: 1; transform: none; }
 
-    .reveal.visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    @media (max-width: 720px) {
-      .nav-links { display: none; }
-      .about-layout { grid-template-columns: 1fr; }
-      section { padding: 64px 0; }
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 820px) {
+      .nav-links a { padding: 0 12px; }
+      .hero-meta { display: none; }
+      .disc-row { grid-template-columns: 48px 1fr 24px; }
+      .disc-desc { display: none; }
+      .proj-summary { grid-template-columns: 48px 1fr 24px; }
+      .proj-cat, .proj-year { display: none; }
+      .proj-detail-inner { padding-left: 8px; flex-direction: column; gap: 24px; }
+      .stats { grid-template-columns: 1fr; }
+      .approach { grid-template-columns: 1fr; gap: 40px; }
+      section { padding: 72px 0; }
     }
   </style>
 </head>
 <body>
 
   <nav>
-    <div class="container nav-inner">
-      <a class="nav-logo" href="#top">omar<span>.soubhi</span></a>
+    <div class="wrap nav-inner">
+      <a class="nav-mark" href="#top"><span class="dot"></span>Field Index</a>
       <ul class="nav-links">
-        <li><a href="#expertise">Expertise</a></li>
+        <li><a href="#disciplines">Disciplines</a></li>
         <li><a href="#projects">Projects</a></li>
-        <li><a href="#about">About</a></li>
+        <li><a href="#approach">Approach</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </div>
   </nav>
 
   <header id="top">
-    <div class="hero-grid"></div>
-    <div class="container hero-content">
-      <p class="hero-eyebrow">// planning · engineering · data · consulting</p>
-      <h1>Omar Soubhi<br><span class="muted">I build tools that make complex work simple.</span></h1>
-      <p class="hero-sub">Engineer and consultant with a focus on planning, data analysis, and turning messy operational problems into clean, working solutions.</p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="#projects">View Projects</a>
-        <a class="btn btn-ghost" href="#contact">Get in Touch</a>
+    <div class="field"></div>
+    <span class="reg tl"></span><span class="reg tr"></span>
+    <span class="reg bl"></span><span class="reg br"></span>
+    <div class="hero-meta">
+      <div>SHT <span class="v">01</span> — REV <span class="v">B</span></div>
+      <div>SCALE <span class="v">1:1</span></div>
+      <div>STATUS <span class="v">IN SERVICE</span></div>
+    </div>
+    <div id="coords">X:0000 Y:0000</div>
+
+    <div class="wrap hero-body">
+      <p class="hero-kicker">Independent practice — est. on the job</p>
+      <h1>
+        <span class="row">Plans that</span>
+        <span class="row indent"><em class="serif">hold.</em> Tools that</span>
+        <span class="row"><em class="serif">work.</em> Data that</span>
+        <span class="row indent">decides.</span>
+      </h1>
+      <div class="hero-foot">
+        <p class="hero-sub">Planning, engineering, data analysis, and consulting — practiced as one discipline. Every bottleneck met here gets measured, understood, and engineered into a tool.</p>
+        <a class="hero-cta" href="#projects">Open the index ↓</a>
       </div>
     </div>
   </header>
 
-  <section id="expertise">
-    <div class="container">
-      <p class="section-label">01 — Expertise</p>
-      <h2>What I do</h2>
-      <p class="section-intro">Four disciplines, one goal: decisions backed by data and plans that survive contact with reality.</p>
-      <div class="expertise-grid">
-        <div class="expertise-card reveal">
-          <div class="icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </div>
-          <h3>Planning</h3>
-          <p>Project and resource planning that accounts for real-world constraints — schedules, dependencies, and risk built in from day one.</p>
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="ticker-track">
+      <span>Planning <b>✦</b></span><span>Engineering <b>✦</b></span><span>Data Analysis <b>✦</b></span><span>Consulting <b>✦</b></span><span>Automation <b>✦</b></span><span>Dashboards <b>✦</b></span><span>Modelling <b>✦</b></span><span>Field-built tools <b>✦</b></span>
+    </div>
+  </div>
+
+  <section id="disciplines">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="sec-num">SEC. 01 — Disciplines</p>
+          <h2>Four trades, <em class="serif">one method</em></h2>
         </div>
-        <div class="expertise-card reveal">
-          <div class="icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-          </div>
-          <h3>Engineering</h3>
-          <p>Hands-on engineering across systems and processes — designing, building, and improving how things actually get made and run.</p>
-        </div>
-        <div class="expertise-card reveal">
-          <div class="icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          </div>
-          <h3>Data Analysis</h3>
-          <p>From raw exports to clear answers — dashboards, models, and analyses that turn scattered data into decisions.</p>
-        </div>
-        <div class="expertise-card reveal">
-          <div class="icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <h3>Consulting</h3>
-          <p>Advisory work grounded in doing, not just recommending — I help teams diagnose problems and then build the fix with them.</p>
-        </div>
+        <p class="sec-note">Diagnose → Plan → Build → Measure</p>
+      </div>
+
+      <div class="disc-row reveal">
+        <span class="disc-num">/ 01</span>
+        <span class="disc-name">Planning</span>
+        <span class="disc-desc">Schedules, resources, and risk mapped against real constraints — plans built to survive contact with the field, not just the kickoff meeting.</span>
+        <span class="disc-arrow">→</span>
+      </div>
+      <div class="disc-row reveal">
+        <span class="disc-num">/ 02</span>
+        <span class="disc-name">Engineering</span>
+        <span class="disc-desc">Hands-on design and problem-solving across systems and processes — how things get made, run, and improved.</span>
+        <span class="disc-arrow">→</span>
+      </div>
+      <div class="disc-row reveal">
+        <span class="disc-num">/ 03</span>
+        <span class="disc-name">Data Analysis</span>
+        <span class="disc-desc">Raw exports into clear answers. Models, dashboards, and analyses that end arguments and start decisions.</span>
+        <span class="disc-arrow">→</span>
+      </div>
+      <div class="disc-row reveal">
+        <span class="disc-num">/ 04</span>
+        <span class="disc-name">Consulting</span>
+        <span class="disc-desc">Advisory grounded in doing. Diagnose the problem with the team, then stay and build the fix.</span>
+        <span class="disc-arrow">→</span>
       </div>
     </div>
   </section>
 
   <section id="projects">
-    <div class="container">
-      <p class="section-label">02 — Projects</p>
-      <h2>Tools built on the job</h2>
-      <p class="section-intro">A selection of tools I've created to solve real problems at work. Each one started as a bottleneck and ended as a working solution.</p>
-      <div class="projects-grid" id="projects-grid"></div>
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="sec-num">SEC. 02 — Project Index</p>
+          <h2>Tools built <em class="serif">on the job</em></h2>
+        </div>
+        <p class="sec-note" id="proj-count">— entries on file</p>
+      </div>
+      <div class="proj-index" id="proj-index"></div>
     </div>
   </section>
 
-  <section id="about">
-    <div class="container">
-      <p class="section-label">03 — About</p>
-      <h2>Behind the work</h2>
-      <div class="about-layout">
-        <div class="about-text">
-          <p>I work at the intersection of <strong>engineering and analysis</strong> — the place where a plan on paper meets the data that tells you whether it's working.</p>
-          <p>Most of what I build starts the same way: a repetitive task, a spreadsheet stretched past its limits, or a question nobody could answer quickly. I turn those into <strong>tools people actually use</strong> — automations, dashboards, and models that save hours and remove guesswork.</p>
-          <p>Whether I'm planning a project, analyzing a dataset, or advising a team, the approach is the same: understand the problem deeply, keep the solution simple, and make sure it holds up in practice.</p>
+  <section>
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat reveal">
+          <span class="num" data-count>—</span>
+          <span class="lbl">Tools built &amp; in service</span>
         </div>
-        <div class="stat-list">
-          <div class="stat reveal">
-            <div class="num" data-count>—</div>
-            <div class="label">Tools built &amp; deployed</div>
-          </div>
-          <div class="stat reveal">
-            <div class="num">4</div>
-            <div class="label">Core disciplines</div>
-          </div>
-          <div class="stat reveal">
-            <div class="num">1</div>
-            <div class="label">Rule: keep it simple</div>
-          </div>
+        <div class="stat reveal">
+          <span class="num">04</span>
+          <span class="lbl">Disciplines, one method</span>
+        </div>
+        <div class="stat reveal">
+          <span class="num">00</span>
+          <span class="lbl">Tools abandoned by their users</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="approach">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="sec-num">SEC. 03 — Approach</p>
+          <h2>Behind <em class="serif">the work</em></h2>
+        </div>
+      </div>
+      <div class="approach">
+        <p class="pull reveal">"Every tool here started as a bottleneck — <b>a spreadsheet past its limits, a question nobody could answer fast.</b>"</p>
+        <div class="approach-text reveal">
+          <p>This practice sits at the intersection of <strong>engineering and analysis</strong> — the place where a plan on paper meets the data that says whether it's working.</p>
+          <p>The pattern is always the same: a repetitive task, a manual process stretched too far, a decision made on gut feel because the numbers took too long. Those become <strong>tools people actually use</strong> — automations, dashboards, and models that remove hours and guesswork.</p>
+          <p>The method doesn't change with the job: understand the problem deeply, keep the solution simple, and make sure it holds up in the field.</p>
         </div>
       </div>
     </div>
   </section>
 
   <section id="contact">
-    <div class="container contact-box">
-      <p class="section-label">04 — Contact</p>
-      <h2>Let's work together</h2>
-      <p class="section-intro">Have a problem that needs planning, analysis, or a tool that doesn't exist yet? I'd like to hear about it.</p>
-      <a class="btn btn-primary" href="mailto:omarsoubhi@gmail.com">omarsoubhi@gmail.com</a>
+    <div class="wrap">
+      <p class="contact-kicker">SEC. 04 — Contact / open for inquiries</p>
+      <a class="email-link" href="mailto:omarsoubhi@gmail.com">omarsoubhi@gmail.com</a>
     </div>
   </section>
 
   <footer>
-    <div class="container footer-inner">
-      <span>© <span id="year"></span> Omar Soubhi</span>
-      <span><a href="#top">Back to top ↑</a></span>
+    <div class="wrap foot-inner">
+      <span>© <span id="year"></span> — All rights reserved</span>
+      <span>SHT 01 OF 01 · REV B</span>
+      <span><a href="#top">↑ Back to top</a></span>
     </div>
   </footer>
 
   <script>
     // ============================================================
-    // PROJECTS — edit this array to add/remove projects.
-    // Each entry: title, tag (short category badge), description,
-    // tech (array of tags), link (optional URL or null).
+    // PROJECT INDEX — edit this array to add/remove projects.
+    // Fields: title, category (mono label), year, description,
+    // tech (array of tags), link (URL or null).
     // ============================================================
     const projects = [
       {
         title: "Sample: Resource Planning Tool",
-        tag: "PLANNING",
-        description: "Placeholder — replace with a real project. Example: a tool that auto-balances team workloads across concurrent projects.",
+        category: "Planning",
+        year: "2025",
+        description: "Placeholder — replace with a real project. Example: a tool that auto-balances team workloads across concurrent projects and flags overallocation before it happens.",
         tech: ["Excel VBA", "Power Query"],
         link: null
       },
       {
         title: "Sample: KPI Dashboard",
-        tag: "DATA",
-        description: "Placeholder — replace with a real project. Example: a live dashboard pulling production data into one view for daily decisions.",
+        category: "Data",
+        year: "2025",
+        description: "Placeholder — replace with a real project. Example: a live dashboard pulling production data into one view, cutting the daily status meeting in half.",
         tech: ["Power BI", "SQL"],
         link: null
       },
       {
         title: "Sample: Report Automation",
-        tag: "AUTOMATION",
+        category: "Automation",
+        year: "2024",
         description: "Placeholder — replace with a real project. Example: a script that turned a 3-hour weekly report into a one-click export.",
         tech: ["Python", "Pandas"],
         link: null
       }
     ];
 
-    const grid = document.getElementById("projects-grid");
-    projects.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "project-card reveal";
-      card.innerHTML = `
-        <div class="project-top">
-          <span class="project-icon">${p.tag}</span>
-          <span class="project-links">${p.link ? `<a href="${p.link}" target="_blank" rel="noopener" aria-label="Open project">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          </a>` : ""}</span>
+    // Build the index table
+    const idx = document.getElementById("proj-index");
+    projects.forEach((p, i) => {
+      const row = document.createElement("div");
+      row.className = "proj-row";
+      row.innerHTML = `
+        <div class="proj-summary">
+          <span class="proj-id">${String(i + 1).padStart(3, "0")}</span>
+          <span class="proj-title">${p.title}</span>
+          <span class="proj-cat">${p.category}</span>
+          <span class="proj-year">${p.year}</span>
+          <span class="proj-toggle">+</span>
         </div>
-        <h3>${p.title}</h3>
-        <p>${p.description}</p>
-        <div class="project-tags">${p.tech.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+        <div class="proj-detail">
+          <div class="proj-detail-inner">
+            <p class="proj-desc">${p.description}</p>
+            <div class="proj-side">
+              <div class="proj-tags">${p.tech.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+              ${p.link ? `<a class="proj-link" href="${p.link}" target="_blank" rel="noopener">View project ↗</a>` : ""}
+            </div>
+          </div>
+        </div>
       `;
-      grid.appendChild(card);
+      const summary = row.querySelector(".proj-summary");
+      const detail = row.querySelector(".proj-detail");
+      summary.addEventListener("click", () => {
+        const open = row.classList.toggle("open");
+        detail.style.maxHeight = open ? detail.scrollHeight + "px" : "0";
+      });
+      idx.appendChild(row);
     });
 
-    // Tool count stat mirrors the projects array
-    document.querySelector("[data-count]").textContent = projects.length;
-
-    // Footer year
+    // Counters
+    document.getElementById("proj-count").textContent =
+      String(projects.length).padStart(2, "0") + " entries on file";
+    document.querySelector("[data-count]").textContent =
+      String(projects.length).padStart(2, "0");
     document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Duplicate ticker content for seamless loop
+    const track = document.getElementById("ticker-track");
+    track.innerHTML += track.innerHTML;
+
+    // Hero coordinate readout
+    const coords = document.getElementById("coords");
+    const hero = document.querySelector("header");
+    hero.addEventListener("mousemove", e => {
+      coords.style.left = e.clientX + "px";
+      coords.style.top = e.clientY + "px";
+      coords.style.opacity = "1";
+      coords.textContent =
+        "X:" + String(e.clientX).padStart(4, "0") +
+        " Y:" + String(e.clientY).padStart(4, "0");
+    });
+    hero.addEventListener("mouseleave", () => { coords.style.opacity = "0"; });
 
     // Scroll reveal
     const observer = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add("visible");
-          observer.unobserve(e.target);
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          en.target.classList.add("visible");
+          observer.unobserve(en.target);
         }
       });
     }, { threshold: 0.12 });
