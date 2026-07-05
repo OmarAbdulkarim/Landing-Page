@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Auditor — DCMA 14-Point XER Analyzer</title>
+  <meta name="description" content="Upload a Primavera P6 XER file and get an instant DCMA 14-point assessment plus additional schedule-quality checks. Fully client-side — your program never leaves the browser.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #0f0e0c;
+      --paper-raise: #16140f;
+      --ink: #ebe6da;
+      --muted: #8d867a;
+      --accent: #ff4d00;
+      --green: #4caf7d;
+      --amber: #e0a63a;
+      --red: #e05252;
+      --line: #2c2822;
+      --line-strong: #453f35;
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+      --sans: 'Space Grotesk', -apple-system, sans-serif;
+      --serif: 'Instrument Serif', Georgia, serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    ::selection { background: var(--accent); color: var(--paper); }
+
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 0 28px; }
+
+    /* ============ TOP BAR ============ */
+    .topbar {
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 58px; gap: 16px;
+    }
+
+    .mark {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+    }
+
+    .mark .dot { width: 8px; height: 8px; background: var(--accent); }
+    .mark .sub { color: var(--muted); }
+
+    .topbar-actions { display: flex; gap: 10px; }
+
+    .btn {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 9px 18px;
+      background: none; border: 1px solid var(--line-strong);
+      color: var(--ink); cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+    .btn.primary:hover { filter: brightness(1.12); color: var(--paper); }
+
+    /* ============ EMPTY STATE ============ */
+    #empty-state { padding: 72px 0 96px; }
+
+    .empty-kicker {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+    }
+
+    .empty-kicker::before { content: ""; width: 40px; height: 1px; background: var(--accent); }
+
+    .empty-title {
+      font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 600;
+      text-transform: uppercase; letter-spacing: -0.03em;
+      line-height: 1.05; margin-bottom: 16px;
+    }
+
+    .empty-title em {
+      font-family: var(--serif); font-style: italic; font-weight: 400;
+      color: var(--accent); text-transform: none;
+    }
+
+    .empty-sub { color: var(--muted); max-width: 600px; margin-bottom: 40px; }
+
+    #dropzone {
+      border: 1px dashed var(--line-strong);
+      padding: 64px 32px; text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    #dropzone:hover, #dropzone.drag { border-color: var(--accent); background: var(--paper-raise); }
+    #dropzone .dz-icon { font-family: var(--mono); font-size: 28px; color: var(--accent); display: block; margin-bottom: 14px; }
+    #dropzone .dz-main { font-weight: 600; margin-bottom: 6px; }
+    #dropzone .dz-hint {
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    .empty-or {
+      text-align: center; font-family: var(--mono); font-size: 11px;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin: 28px 0;
+    }
+
+    .empty-actions { display: flex; justify-content: center; }
+
+    .privacy-note {
+      margin-top: 48px; font-family: var(--mono); font-size: 11px;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; text-align: center;
+    }
+
+    .privacy-note b { color: var(--green); font-weight: 400; }
+
+    /* ============ RESULTS ============ */
+    #results { display: none; padding: 40px 0 80px; }
+
+    .res-head {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      flex-wrap: wrap; gap: 20px; margin-bottom: 28px;
+    }
+
+    .res-title {
+      font-size: clamp(1.5rem, 3.5vw, 2.4rem); font-weight: 600;
+      text-transform: uppercase; letter-spacing: -0.02em; line-height: 1.05;
+    }
+
+    .res-title em {
+      font-family: var(--serif); font-style: italic; font-weight: 400;
+      color: var(--accent); text-transform: none;
+    }
+
+    .res-meta {
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.9; text-align: right;
+    }
+
+    .res-meta .v { color: var(--ink); }
+
+    .res-controls {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+      margin-bottom: 32px;
+    }
+
+    .res-controls label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+
+    .res-controls select {
+      background: var(--paper-raise); color: var(--ink);
+      border: 1px solid var(--line-strong);
+      font-family: var(--mono); font-size: 11px; padding: 7px 10px; cursor: pointer;
+    }
+
+    .res-controls .spacer { flex: 1; }
+
+    /* score strip */
+    .score-strip {
+      display: grid; grid-template-columns: 220px repeat(auto-fit, minmax(140px, 1fr));
+      border: 1px solid var(--line); border-right: none; margin-bottom: 40px;
+    }
+
+    .score-cell { border-right: 1px solid var(--line); padding: 24px 22px; }
+
+    .score-cell .s-label {
+      font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted); display: block; margin-bottom: 10px;
+    }
+
+    .score-cell .s-value {
+      font-family: var(--serif); font-style: italic;
+      font-size: clamp(1.7rem, 3vw, 2.5rem); line-height: 1; display: block;
+    }
+
+    .score-cell.hero-score { background: var(--paper-raise); }
+    .score-cell.hero-score .s-value { font-size: clamp(2.4rem, 4vw, 3.6rem); color: var(--accent); }
+    .s-value.good { color: var(--green); }
+    .s-value.bad { color: var(--red); }
+
+    .score-cell .s-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 8px; display: block; }
+
+    /* section titles */
+    .block-title {
+      font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted); margin: 0 0 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .block-title b { color: var(--accent); font-weight: 500; }
+    .block-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+    /* check cards */
+    .check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-bottom: 48px; }
+
+    .check {
+      background: var(--paper-raise); border: 1px solid var(--line);
+      transition: border-color 0.2s;
+    }
+
+    .check.open, .check:hover { border-color: var(--line-strong); }
+
+    .check-head {
+      display: grid; grid-template-columns: 44px 1fr auto;
+      gap: 12px; align-items: center; padding: 18px; cursor: pointer; user-select: none;
+    }
+
+    .check-num {
+      font-family: var(--mono); font-size: 12px; color: var(--muted);
+      border: 1px solid var(--line-strong); text-align: center; padding: 6px 0;
+    }
+
+    .check-name { font-weight: 600; font-size: 0.95rem; line-height: 1.3; }
+
+    .check-metric {
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      display: block; margin-top: 3px; letter-spacing: 0.03em;
+    }
+
+    .chip {
+      font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 4px 12px; border: 1px solid; white-space: nowrap;
+    }
+
+    .chip.pass { color: var(--green); border-color: var(--green); }
+    .chip.fail { color: var(--red); border-color: var(--red); }
+    .chip.review { color: var(--amber); border-color: var(--amber); }
+    .chip.na { color: var(--muted); border-color: var(--line-strong); }
+
+    .check-body { display: none; border-top: 1px solid var(--line); padding: 16px 18px; }
+    .check.open .check-body { display: block; }
+
+    .check-note { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; }
+
+    .offender-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .offender-table th {
+      font-family: var(--mono); font-size: 9px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted); text-align: left;
+      padding: 6px 8px; border-bottom: 1px solid var(--line-strong);
+    }
+    .offender-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .offender-table td.mono { font-family: var(--mono); font-size: 0.72rem; white-space: nowrap; }
+
+    .more-note { font-family: var(--mono); font-size: 10px; color: var(--muted); padding-top: 8px; display: block; }
+
+    footer {
+      border-top: 1px solid var(--line); padding: 22px 0;
+      font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+
+    footer .wrap { display: contents; }
+
+    @media (max-width: 720px) {
+      .score-strip { grid-template-columns: 1fr 1fr; }
+      .score-cell { border-bottom: 1px solid var(--line); }
+      .res-meta { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="mark">
+        <span class="dot"></span>
+        <span>Schedule Auditor</span>
+        <span class="sub">/ SHT 03</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn" id="btn-sample">Load sample XER</button>
+        <button class="btn primary" id="btn-upload">Upload .xer</button>
+        <input type="file" id="file-input" accept=".xer" hidden>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ EMPTY STATE ============ -->
+  <div id="empty-state">
+    <div class="wrap">
+      <p class="empty-kicker">P6 schedule quality control — v1.0</p>
+      <h1 class="empty-title">Your program,<br><em>cross-examined.</em></h1>
+      <p class="empty-sub">Drop in a Primavera P6 XER export and get an instant DCMA 14-point assessment plus additional weakness checks — open logic, leads and lags, constraints, float, invalid dates, duplicate activities and more. Every failed check lists the exact offending activities.</p>
+
+      <div id="dropzone">
+        <span class="dz-icon">⇩</span>
+        <p class="dz-main">Drag an .xer file here, or click to browse</p>
+        <p class="dz-hint">Reads the XER's own CPM results — no scheduling recalculation, no surprises</p>
+      </div>
+
+      <p class="empty-or">— or —</p>
+      <div class="empty-actions">
+        <button class="btn" id="btn-sample-2">Audit a sample schedule with seeded defects</button>
+      </div>
+
+      <p class="privacy-note"><b>●</b> 100% client-side — your program never leaves this browser</p>
+    </div>
+  </div>
+
+  <!-- ============ RESULTS ============ -->
+  <div id="results">
+    <div class="wrap">
+      <div class="res-head">
+        <h2 class="res-title">Audit <em>findings</em></h2>
+        <div class="res-meta">
+          <div>SOURCE <span class="v" id="meta-source">—</span></div>
+          <div>DATA DATE <span class="v" id="meta-dd">—</span></div>
+          <div>GENERATED <span class="v" id="meta-gen">—</span></div>
+        </div>
+      </div>
+
+      <div class="res-controls">
+        <label>Project:</label>
+        <select id="proj-select"></select>
+        <span class="spacer"></span>
+        <button class="btn" id="btn-csv">Download findings CSV</button>
+        <button class="btn" id="btn-new">Audit another file</button>
+      </div>
+
+      <div class="score-strip" id="score-strip"></div>
+
+      <p class="block-title"><b>PART 1</b> DCMA 14-point assessment</p>
+      <div class="check-grid" id="dcma-grid"></div>
+
+      <p class="block-title"><b>PART 2</b> Additional weakness checks</p>
+      <div class="check-grid" id="extra-grid"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <span>Schedule Auditor v1.0 — part of the Field Index toolset</span>
+      <span>Client-side only · No data transmitted</span>
+    </div>
+  </footer>
+
+  <script>
+  "use strict";
+
+  /* =================================================================
+     SCHEDULE AUDITOR — DCMA 14-point + weakness checks on P6 XER
+     Reads the XER's stored CPM results; does not re-run scheduling.
+     ================================================================= */
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+  let xer = null;          // parsed tables
+  let sourceName = "";
+  let lastResults = null;  // for CSV export
+
+  /* ---------------- XER PARSER ---------------- */
+
+  function parseXER(text) {
+    const tables = {};
+    let cur = null;
+    for (const line of text.split(/\r?\n/)) {
+      if (!line) continue;
+      const cells = line.split("\t");
+      const tag = cells[0];
+      if (tag === "%T") {
+        cur = { fields: [], rows: [] };
+        tables[cells[1]] = cur;
+      } else if (tag === "%F" && cur) {
+        cur.fields = cells.slice(1);
+      } else if (tag === "%R" && cur) {
+        const row = {};
+        cur.fields.forEach((f, i) => { row[f] = cells[i + 1] !== undefined ? cells[i + 1] : ""; });
+        cur.rows.push(row);
+      }
+    }
+    return tables;
+  }
+
+  const num = v => { const n = parseFloat(v); return isNaN(n) ? null : n; };
+  const dat = v => { if (!v) return null; const d = new Date(v.replace(" ", "T")); return isNaN(d) ? null : d; };
+  const fmtD = d => d ? d.toISOString().slice(0, 10) : "—";
+  const pct = v => (v * 100).toFixed(1) + "%";
+
+  /* ---------------- ANALYSIS CONTEXT ---------------- */
+
+  function buildContext(projId) {
+    const projRow = xer.PROJECT.rows.find(r => r.proj_id === projId) || {};
+    const dataDate = dat(projRow.last_recalc_date);
+
+    // calendars: hours per day
+    const calHpd = {};
+    (xer.CALENDAR ? xer.CALENDAR.rows : []).forEach(c => {
+      const h = num(c.day_hr_cnt);
+      if (h) calHpd[c.clndr_id] = h;
+    });
+
+    const allTasks = (xer.TASK ? xer.TASK.rows : []).filter(t => t.proj_id === projId);
+    const taskById = {};
+    allTasks.forEach(t => { taskById[t.task_id] = t; });
+
+    // helpers on tasks
+    const hpd = t => calHpd[t.clndr_id] || 8;
+    const isLOE = t => t.task_type === "TT_LOE";
+    const isWBS = t => t.task_type === "TT_WBS";
+    const isMile = t => t.task_type === "TT_Mile" || t.task_type === "TT_FinMile";
+    const isComplete = t => t.status_code === "TK_Complete";
+    const isNotStart = t => t.status_code === "TK_NotStart";
+
+    // DCMA population: real activities, excl. LOE & WBS summaries
+    const pop = allTasks.filter(t => !isLOE(t) && !isWBS(t));
+    const incomplete = pop.filter(t => !isComplete(t));
+
+    // relationships where the successor belongs to this project
+    const rels = (xer.TASKPRED ? xer.TASKPRED.rows : []).filter(r => r.proj_id === projId);
+
+    const rsrc = xer.TASKRSRC ? xer.TASKRSRC.rows.filter(r => r.proj_id === projId) : null;
+    const rsrcByTask = {};
+    if (rsrc) rsrc.forEach(r => { (rsrcByTask[r.task_id] = rsrcByTask[r.task_id] || []).push(r); });
+
+    const floatDays = t => { const f = num(t.total_float_hr_cnt); return f === null ? null : f / hpd(t); };
+    const remDays = t => { const r = num(t.remain_drtn_hr_cnt); return r === null ? null : r / hpd(t); };
+    const lagDays = r => {
+      const l = num(r.lag_hr_cnt); if (l === null) return 0;
+      const t = taskById[r.task_id];
+      return l / (t ? hpd(t) : 8);
+    };
+
+    const off = (t, note) => ({ code: t.task_code || t.task_id, name: t.task_name || "", note });
+    const relOff = (r, note) => {
+      const p = taskById[r.pred_task_id], s = taskById[r.task_id];
+      return {
+        code: (p ? p.task_code : r.pred_task_id) + " → " + (s ? s.task_code : r.task_id),
+        name: (s ? s.task_name : ""), note
+      };
+    };
+
+    return { projRow, dataDate, allTasks, taskById, pop, incomplete, rels, rsrcByTask, hasRsrc: !!rsrc && rsrc.length > 0,
+             hpd, isLOE, isWBS, isMile, isComplete, isNotStart, floatDays, remDays, lagDays, off, relOff };
+  }
+
+  /* ---------------- DCMA CHECKS ---------------- */
+
+  function ratioCheck(count, total, limit, invert) {
+    if (!total) return "na";
+    const r = count / total;
+    if (invert) return r >= limit ? "pass" : "fail";   // "must be at least"
+    return r <= limit ? "pass" : "fail";               // "must not exceed"
+  }
+
+  function runDCMA(c) {
+    const out = [];
+
+    /* 1 — Missing logic */
+    {
+      const hasPred = new Set(c.rels.map(r => r.task_id));
+      const hasSucc = new Set(c.rels.map(r => r.pred_task_id));
+      const offenders = [];
+      c.incomplete.forEach(t => {
+        const missP = !hasPred.has(t.task_id) && t.task_type !== "TT_Mile" ? "no predecessor" : null;
+        const missS = !hasSucc.has(t.task_id) && t.task_type !== "TT_FinMile" ? "no successor" : null;
+        if (missP || missS) offenders.push(c.off(t, [missP, missS].filter(Boolean).join(" + ")));
+      });
+      out.push({ id: 1, name: "Missing logic", threshold: "≤ 5% of incomplete activities",
+        metric: `${offenders.length} of ${c.incomplete.length} (${c.incomplete.length ? pct(offenders.length / c.incomplete.length) : "—"})`,
+        status: ratioCheck(offenders.length, c.incomplete.length, 0.05), offenders,
+        note: "Incomplete activities with no predecessor and/or no successor. Project start/finish milestones are exempt." });
+    }
+
+    /* 2 — Leads (negative lag) */
+    {
+      const offenders = c.rels.filter(r => c.lagDays(r) < 0)
+        .map(r => c.relOff(r, `${r.pred_type ? r.pred_type.replace("PR_","") : "?"} lag ${c.lagDays(r).toFixed(1)}d`));
+      out.push({ id: 2, name: "Leads (negative lags)", threshold: "0 permitted",
+        metric: `${offenders.length} of ${c.rels.length} relationships`,
+        status: c.rels.length ? (offenders.length === 0 ? "pass" : "fail") : "na", offenders,
+        note: "Negative lag hides logic and distorts the critical path. DCMA tolerance is zero." });
+    }
+
+    /* 3 — Lags */
+    {
+      const offenders = c.rels.filter(r => c.lagDays(r) > 0)
+        .map(r => c.relOff(r, `${r.pred_type ? r.pred_type.replace("PR_","") : "?"} lag +${c.lagDays(r).toFixed(1)}d`));
+      out.push({ id: 3, name: "Lags", threshold: "≤ 5% of relationships",
+        metric: `${offenders.length} of ${c.rels.length} (${c.rels.length ? pct(offenders.length / c.rels.length) : "—"})`,
+        status: ratioCheck(offenders.length, c.rels.length, 0.05), offenders,
+        note: "Positive lags should be replaced with real activities wherever the wait represents work or a deliverable." });
+    }
+
+    /* 4 — Relationship types */
+    {
+      const fs = c.rels.filter(r => r.pred_type === "PR_FS").length;
+      const offenders = c.rels.filter(r => r.pred_type !== "PR_FS")
+        .map(r => c.relOff(r, (r.pred_type || "?").replace("PR_", "") + " relationship"));
+      out.push({ id: 4, name: "Relationship types (FS ≥ 90%)", threshold: "≥ 90% Finish-to-Start",
+        metric: `${fs} of ${c.rels.length} FS (${c.rels.length ? pct(fs / c.rels.length) : "—"})`,
+        status: ratioCheck(fs, c.rels.length, 0.90, true), offenders,
+        note: "SS/FF have legitimate uses; SF almost never does. Listed: every non-FS relationship." });
+    }
+
+    /* 5 — Hard constraints */
+    {
+      const HARD = { CS_MANDSTART: "Mandatory Start", CS_MANDFIN: "Mandatory Finish", CS_MSO: "Must Start On", CS_MEO: "Must Finish On" };
+      const offenders = c.incomplete.filter(t => HARD[t.cstr_type])
+        .map(t => c.off(t, HARD[t.cstr_type] + (t.cstr_date ? " @ " + fmtD(dat(t.cstr_date)) : "")));
+      out.push({ id: 5, name: "Hard constraints", threshold: "≤ 5% of incomplete activities",
+        metric: `${offenders.length} of ${c.incomplete.length} (${c.incomplete.length ? pct(offenders.length / c.incomplete.length) : "—"})`,
+        status: ratioCheck(offenders.length, c.incomplete.length, 0.05), offenders,
+        note: "Hard constraints override logic and can mask true float. Prefer soft constraints or, better, logic." });
+    }
+
+    /* 6 — High float */
+    {
+      const offenders = c.incomplete.filter(t => { const f = c.floatDays(t); return f !== null && f > 44; })
+        .map(t => c.off(t, `TF ${c.floatDays(t).toFixed(0)}d`));
+      out.push({ id: 6, name: "High float (> 44 days)", threshold: "≤ 5% of incomplete activities",
+        metric: `${offenders.length} of ${c.incomplete.length} (${c.incomplete.length ? pct(offenders.length / c.incomplete.length) : "—"})`,
+        status: ratioCheck(offenders.length, c.incomplete.length, 0.05), offenders,
+        note: "Excessive total float usually means missing logic, not schedule health." });
+    }
+
+    /* 7 — Negative float */
+    {
+      const offenders = c.incomplete.filter(t => { const f = c.floatDays(t); return f !== null && f < 0; })
+        .map(t => c.off(t, `TF ${c.floatDays(t).toFixed(1)}d`));
+      out.push({ id: 7, name: "Negative float", threshold: "0 permitted",
+        metric: `${offenders.length} activities`,
+        status: c.incomplete.length ? (offenders.length === 0 ? "pass" : "fail") : "na", offenders,
+        note: "Negative float means the plan cannot meet a constraint or deadline — it demands a recovery plan, not silence." });
+    }
+
+    /* 8 — High duration */
+    {
+      const eligible = c.incomplete.filter(t => !c.isMile(t));
+      const offenders = eligible.filter(t => { const r = c.remDays(t); return r !== null && r > 44; })
+        .map(t => c.off(t, `RD ${c.remDays(t).toFixed(0)}d`));
+      out.push({ id: 8, name: "High duration (> 44 days)", threshold: "≤ 5% of incomplete activities",
+        metric: `${offenders.length} of ${eligible.length} (${eligible.length ? pct(offenders.length / eligible.length) : "—"})`,
+        status: ratioCheck(offenders.length, eligible.length, 0.05), offenders,
+        note: "Long activities hide progress and slip. Break them into measurable pieces." });
+    }
+
+    /* 9 — Invalid dates */
+    {
+      const dd = c.dataDate;
+      const offenders = [];
+      if (dd) c.pop.forEach(t => {
+        const as = dat(t.act_start_date), ae = dat(t.act_end_date);
+        const es = dat(t.early_start_date), ee = dat(t.early_end_date);
+        if (as && as > dd) offenders.push(c.off(t, "actual start after data date"));
+        if (ae && ae > dd) offenders.push(c.off(t, "actual finish after data date"));
+        if (c.isNotStart(t) && es && es < dd) offenders.push(c.off(t, "forecast start before data date"));
+        if (!c.isComplete(t) && ee && ee < dd) offenders.push(c.off(t, "forecast finish before data date"));
+      });
+      out.push({ id: 9, name: "Invalid dates", threshold: "0 permitted",
+        metric: dd ? `${offenders.length} violations` : "no data date found",
+        status: dd ? (offenders.length === 0 ? "pass" : "fail") : "na", offenders,
+        note: "Actuals must sit at or before the data date; forecasts at or after it. Violations = a broken status update." });
+    }
+
+    /* 10 — Resources */
+    {
+      if (!c.hasRsrc) {
+        out.push({ id: 10, name: "Resources", threshold: "All activities ≥ 1 day resourced/costed",
+          metric: "no TASKRSRC table in this XER", status: "na", offenders: [],
+          note: "Export the XER with resource assignments to run this check." });
+      } else {
+        const eligible = c.incomplete.filter(t => !c.isMile(t) && (c.remDays(t) || 0) >= 1);
+        const offenders = eligible.filter(t => !(c.rsrcByTask[t.task_id] || []).length)
+          .map(t => c.off(t, "no resource/cost assignment"));
+        out.push({ id: 10, name: "Resources", threshold: "All activities ≥ 1 day resourced/costed",
+          metric: `${offenders.length} of ${eligible.length} unresourced`,
+          status: eligible.length ? (offenders.length === 0 ? "pass" : "fail") : "na", offenders,
+          note: "Unresourced work can't be earned-value managed and hides cost exposure." });
+      }
+    }
+
+    /* 11 — Missed tasks (planned-dates proxy for baseline) */
+    {
+      const dd = c.dataDate;
+      let status = "na", metric = "no data date found", offenders = [];
+      if (dd) {
+        const due = c.pop.filter(t => { const te = dat(t.target_end_date); return te && te <= dd; });
+        offenders = due.filter(t => {
+          const ae = dat(t.act_end_date), te = dat(t.target_end_date);
+          return (ae && te && ae > te) || (!c.isComplete(t));
+        }).map(t => c.off(t, c.isComplete(t) ? "finished late vs planned" : "due but not finished"));
+        metric = `${offenders.length} of ${due.length} due (${due.length ? pct(offenders.length / due.length) : "—"})`;
+        status = ratioCheck(offenders.length, due.length, 0.05);
+        if (status !== "na") status = status === "pass" ? "pass" : "fail";
+      }
+      out.push({ id: 11, name: "Missed tasks", threshold: "≤ 5% of activities due by data date",
+        metric, status, offenders,
+        note: "Uses P6 planned (target) dates as the baseline proxy — if your baseline lives in a separate project, verify there." });
+    }
+
+    /* 12 — Critical path test (manual) */
+    out.push({ id: 12, name: "Critical path test", threshold: "Manual test in P6",
+      metric: "not automatable from a static XER", status: "review", offenders: [],
+      note: "In P6: add 600 days to a critical activity's remaining duration and reschedule. The project finish must move accordingly. If it doesn't, logic is broken or constraints are steering the schedule." });
+
+    /* 13 — CPLI (estimate) */
+    {
+      const dd = c.dataDate;
+      const inc = c.incomplete.filter(t => dat(t.early_end_date));
+      if (!dd || !inc.length) {
+        out.push({ id: 13, name: "CPLI", threshold: "≥ 0.95", metric: "insufficient data",
+          status: "na", offenders: [], note: "Needs a data date and incomplete activities with forecast finishes." });
+      } else {
+        const finTask = inc.reduce((a, b) => dat(a.early_end_date) > dat(b.early_end_date) ? a : b);
+        const calDays = (dat(finTask.early_end_date) - dd) / 86400000;
+        const cpl = Math.max(calDays * 5 / 7, 1);
+        const tf = c.floatDays(finTask) || 0;
+        const cpli = (cpl + tf) / cpl;
+        out.push({ id: 13, name: "CPLI (estimated)", threshold: "≥ 0.95",
+          metric: `≈ ${cpli.toFixed(2)} (CP length ≈ ${cpl.toFixed(0)}wd, TF ${tf.toFixed(0)}d)`,
+          status: "review", offenders: [c.off(finTask, "drives project finish")],
+          note: "Estimated with a 5/7 working-day conversion and the finish activity's float. Treat as an indicator; confirm in P6 before reporting it." });
+      }
+    }
+
+    /* 14 — BEI (planned-dates proxy) */
+    {
+      const dd = c.dataDate;
+      let status = "na", metric = "no data date found", offenders = [];
+      if (dd) {
+        const planned = c.pop.filter(t => { const te = dat(t.target_end_date); return te && te <= dd; });
+        const actual = c.pop.filter(t => { const ae = dat(t.act_end_date); return ae && ae <= dd; });
+        const bei = planned.length ? actual.length / planned.length : null;
+        metric = bei === null ? "no activities due yet" : `${bei.toFixed(2)} (${actual.length} finished / ${planned.length} planned)`;
+        status = bei === null ? "na" : bei >= 0.95 ? "pass" : "fail";
+        offenders = planned.filter(t => !c.isComplete(t)).map(t => c.off(t, "planned finish passed, not complete"));
+      }
+      out.push({ id: 14, name: "BEI (Baseline Execution Index)", threshold: "≥ 0.95",
+        metric, status, offenders,
+        note: "Uses planned (target) dates as the baseline proxy — same caveat as check 11." });
+    }
+
+    return out;
+  }
+
+  /* ---------------- ADDITIONAL CHECKS ---------------- */
+
+  function runExtras(c) {
+    const out = [];
+
+    /* A1 — SF relationships */
+    {
+      const offenders = c.rels.filter(r => r.pred_type === "PR_SF").map(r => c.relOff(r, "Start-to-Finish"));
+      out.push({ id: "A1", name: "Start-to-Finish relationships", threshold: "0 recommended",
+        metric: `${offenders.length} found`, status: offenders.length ? "fail" : "pass", offenders,
+        note: "SF logic is almost always a modelling error — it makes the successor's finish depend on the predecessor's start." });
+    }
+
+    /* A2 — Excessive lags (≥ 10 days) */
+    {
+      const offenders = c.rels.filter(r => c.lagDays(r) >= 10)
+        .map(r => c.relOff(r, `lag ${c.lagDays(r).toFixed(0)}d`));
+      out.push({ id: "A2", name: "Excessive lags (≥ 10 days)", threshold: "0 recommended",
+        metric: `${offenders.length} found`, status: offenders.length ? "fail" : "pass", offenders,
+        note: "A 10-day+ lag is a hidden activity with no name, no owner, and no progress measurement. Model it explicitly." });
+    }
+
+    /* A3 — Duplicate activity names */
+    {
+      const seen = {};
+      c.pop.forEach(t => {
+        const k = (t.task_name || "").trim().toLowerCase();
+        if (!k) return;
+        (seen[k] = seen[k] || []).push(t);
+      });
+      const offenders = [];
+      Object.values(seen).filter(g => g.length > 1)
+        .forEach(g => g.forEach(t => offenders.push(c.off(t, `name shared by ${g.length} activities`))));
+      out.push({ id: "A3", name: "Duplicate activity names", threshold: "0 recommended",
+        metric: `${offenders.length} activities affected`, status: offenders.length ? "fail" : "pass", offenders,
+        note: "Duplicates cause mis-statusing in the field — the wrong activity gets progressed." });
+    }
+
+    /* A4 — Actual-date consistency */
+    {
+      const offenders = [];
+      c.pop.forEach(t => {
+        if (t.status_code !== "TK_NotStart" && !dat(t.act_start_date)) offenders.push(c.off(t, "started/complete but no actual start"));
+        if (c.isComplete(t) && !dat(t.act_end_date)) offenders.push(c.off(t, "complete but no actual finish"));
+        if (c.isNotStart(t) && (dat(t.act_start_date) || dat(t.act_end_date))) offenders.push(c.off(t, "not started but has actual dates"));
+      });
+      out.push({ id: "A4", name: "Actual-date consistency", threshold: "0 permitted",
+        metric: `${offenders.length} violations`, status: offenders.length ? "fail" : "pass", offenders,
+        note: "Status codes and actual dates that contradict each other mean the update process is broken." });
+    }
+
+    /* A5 — Constraint inventory */
+    {
+      const NAMES = { CS_MANDSTART: "Mandatory Start", CS_MANDFIN: "Mandatory Finish", CS_MSO: "Must Start On",
+        CS_MEO: "Must Finish On", CS_MSOA: "Start On or After", CS_MSOB: "Start On or Before",
+        CS_MEOA: "Finish On or After", CS_MEOB: "Finish On or Before", CS_ALAP: "As Late As Possible" };
+      const offenders = c.pop.filter(t => t.cstr_type)
+        .map(t => c.off(t, (NAMES[t.cstr_type] || t.cstr_type) + (t.cstr_date ? " @ " + fmtD(dat(t.cstr_date)) : "")));
+      out.push({ id: "A5", name: "Constraint inventory", threshold: "informational",
+        metric: `${offenders.length} constrained activities`, status: offenders.length ? "review" : "pass", offenders,
+        note: "Every constraint is a place where logic was overruled. Each one should have a written justification." });
+    }
+
+    /* A6 — LOE & summary share */
+    {
+      const loe = c.allTasks.filter(c.isLOE).length;
+      const wbs = c.allTasks.filter(c.isWBS).length;
+      out.push({ id: "A6", name: "LOE / summary activities", threshold: "informational",
+        metric: `${loe} LOE · ${wbs} WBS summaries · ${c.pop.length} real activities`,
+        status: "review", offenders: [],
+        note: "LOE and summary activities are excluded from the DCMA population above, per the standard." });
+    }
+
+    return out;
+  }
+
+  /* ---------------- RENDER ---------------- */
+
+  function analyze(projId) {
+    const c = buildContext(projId);
+    const dcma = runDCMA(c);
+    const extras = runExtras(c);
+    lastResults = { c, dcma, extras };
+
+    $("meta-source").textContent = sourceName;
+    $("meta-dd").textContent = fmtD(c.dataDate);
+    $("meta-gen").textContent = fmtD(new Date());
+
+    const passes = dcma.filter(r => r.status === "pass").length;
+    const fails = dcma.filter(r => r.status === "fail").length;
+    const scored = passes + fails;
+
+    $("score-strip").innerHTML = `
+      <div class="score-cell hero-score">
+        <span class="s-label">DCMA score</span>
+        <span class="s-value">${passes}/${scored}</span>
+        <span class="s-sub">${dcma.length - scored} review / N-A</span>
+      </div>
+      <div class="score-cell">
+        <span class="s-label">Activities</span>
+        <span class="s-value">${c.pop.length}</span>
+        <span class="s-sub">${c.incomplete.length} incomplete</span>
+      </div>
+      <div class="score-cell">
+        <span class="s-label">Relationships</span>
+        <span class="s-value">${c.rels.length}</span>
+        <span class="s-sub">${c.rels.length && c.pop.length ? (c.rels.length / c.pop.length).toFixed(1) : "—"} per activity</span>
+      </div>
+      <div class="score-cell">
+        <span class="s-label">Checks failed</span>
+        <span class="s-value ${fails ? "bad" : "good"}">${fails}</span>
+        <span class="s-sub">of ${scored} scored</span>
+      </div>
+      <div class="score-cell">
+        <span class="s-label">Total findings</span>
+        <span class="s-value">${[...dcma, ...extras].reduce((s, r) => s + r.offenders.length, 0)}</span>
+        <span class="s-sub">across all checks</span>
+      </div>`;
+
+    renderChecks($("dcma-grid"), dcma);
+    renderChecks($("extra-grid"), extras);
+  }
+
+  function renderChecks(grid, checks) {
+    grid.innerHTML = "";
+    const MAX = 200;
+    checks.forEach(r => {
+      const el = document.createElement("div");
+      el.className = "check";
+      const chip = { pass: "PASS", fail: "FAIL", review: "REVIEW", na: "N/A" }[r.status];
+      const shown = r.offenders.slice(0, MAX);
+      el.innerHTML = `
+        <div class="check-head">
+          <span class="check-num">${r.id}</span>
+          <span>
+            <span class="check-name">${esc(r.name)}</span>
+            <span class="check-metric">${esc(r.metric)} · threshold: ${esc(r.threshold)}</span>
+          </span>
+          <span class="chip ${r.status}">${chip}</span>
+        </div>
+        <div class="check-body">
+          <p class="check-note">${esc(r.note)}</p>
+          ${shown.length ? `
+            <table class="offender-table">
+              <thead><tr><th>ID</th><th>Activity</th><th>Finding</th></tr></thead>
+              <tbody>${shown.map(o => `
+                <tr><td class="mono">${esc(o.code)}</td><td>${esc(o.name)}</td><td class="mono">${esc(o.note)}</td></tr>`).join("")}
+              </tbody>
+            </table>
+            ${r.offenders.length > MAX ? `<span class="more-note">+ ${r.offenders.length - MAX} more — use the CSV export for the full list</span>` : ""}
+          ` : `<span class="more-note">No offending items.</span>`}
+        </div>`;
+      el.querySelector(".check-head").addEventListener("click", () => el.classList.toggle("open"));
+      grid.appendChild(el);
+    });
+  }
+
+  /* ---------------- CSV EXPORT ---------------- */
+
+  $("btn-csv").addEventListener("click", () => {
+    if (!lastResults) return;
+    const rows = [["check_id", "check_name", "status", "item_id", "activity_name", "finding"]];
+    [...lastResults.dcma, ...lastResults.extras].forEach(r => {
+      if (!r.offenders.length) rows.push([r.id, r.name, r.status.toUpperCase(), "", "", r.metric]);
+      r.offenders.forEach(o => rows.push([r.id, r.name, r.status.toUpperCase(), o.code, o.name, o.note]));
+    });
+    const csv = rows.map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "schedule-audit-findings.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  /* ---------------- FILE INTAKE ---------------- */
+
+  function handleFile(file) {
+    if (!/\.xer$/i.test(file.name)) { alert("That doesn't look like an .xer file."); return; }
+    sourceName = file.name;
+    const reader = new FileReader();
+    reader.onload = e => loadXER(e.target.result);
+    reader.readAsText(file, "windows-1252");
+  }
+
+  function loadXER(text) {
+    const tables = parseXER(text);
+    if (!tables.TASK || !tables.PROJECT) {
+      alert("Couldn't find TASK/PROJECT tables — is this a valid XER export?");
+      return;
+    }
+    xer = tables;
+
+    // project selector — only projects that actually own tasks
+    const owners = new Set(tables.TASK.rows.map(t => t.proj_id));
+    const projs = tables.PROJECT.rows.filter(p => owners.has(p.proj_id));
+    const sel = $("proj-select");
+    sel.innerHTML = projs.map(p =>
+      `<option value="${esc(p.proj_id)}">${esc(p.proj_short_name || p.proj_id)}</option>`).join("");
+
+    $("empty-state").style.display = "none";
+    $("results").style.display = "block";
+    analyze(sel.value);
+    window.scrollTo({ top: 0 });
+  }
+
+  $("proj-select").addEventListener("change", e => analyze(e.target.value));
+
+  $("btn-new").addEventListener("click", () => {
+    $("results").style.display = "none";
+    $("empty-state").style.display = "block";
+  });
+
+  $("btn-upload").addEventListener("click", () => $("file-input").click());
+  $("file-input").addEventListener("change", e => {
+    if (e.target.files.length) handleFile(e.target.files[0]);
+    e.target.value = "";
+  });
+
+  const dz = $("dropzone");
+  dz.addEventListener("click", () => $("file-input").click());
+  dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("drag"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag"));
+  dz.addEventListener("drop", e => {
+    e.preventDefault(); dz.classList.remove("drag");
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+
+  /* ---------------- SAMPLE XER (seeded defects) ---------------- */
+
+  const SAMPLE_XER = [
+    "ERMHDR\t19.12\t2026-07-06\tProject\tadmin\tSample\tdbxDatabaseNoName\tProject Management\tUSD",
+    "%T\tPROJECT",
+    "%F\tproj_id\tproj_short_name\tlast_recalc_date\tplan_end_date",
+    "%R\t1000\tRIVERSIDE-TWR\t2026-07-06 08:00\t2026-12-30 17:00",
+    "%T\tCALENDAR",
+    "%F\tclndr_id\tclndr_name\tday_hr_cnt",
+    "%R\t500\tStandard 8h\t8",
+    "%T\tTASK",
+    "%F\ttask_id\tproj_id\tclndr_id\ttask_code\ttask_name\ttask_type\tstatus_code\tcstr_type\tcstr_date\tact_start_date\tact_end_date\tearly_start_date\tearly_end_date\ttarget_start_date\ttarget_end_date\ttotal_float_hr_cnt\tremain_drtn_hr_cnt\ttarget_drtn_hr_cnt",
+    "%R\t1\t1000\t500\tA1000\tMobilization\tTT_Task\tTK_Complete\t\t\t2026-01-05 08:00\t2026-02-10 17:00\t\t\t2026-01-05 08:00\t2026-02-01 17:00\t\t0\t160",
+    "%R\t2\t1000\t500\tA1010\tExcavation\tTT_Task\tTK_Complete\t\t\t2026-02-11 08:00\t2026-03-20 17:00\t\t\t2026-02-11 08:00\t2026-03-20 17:00\t\t0\t224",
+    "%R\t3\t1000\t500\tA1020\tFoundations\tTT_Task\tTK_Active\t\t\t2026-03-21 08:00\t\t2026-07-06 08:00\t2026-08-15 17:00\t2026-03-21 08:00\t2026-07-30 17:00\t40\t240\t720",
+    "%R\t4\t1000\t500\tA1030\tStructure L1-L5\tTT_Task\tTK_Active\t\t\t2026-05-10 08:00\t\t2026-07-06 08:00\t2026-10-30 17:00\t2026-05-10 08:00\t2026-09-30 17:00\t80\t480\t800",
+    "%R\t5\t1000\t500\tA1040\tStructure L6-L10\tTT_Task\tTK_NotStart\t\t\t\t\t2026-08-01 08:00\t2026-11-10 17:00\t2026-07-20 08:00\t2026-10-20 17:00\t400\t560\t560",
+    "%R\t6\t1000\t500\tA1050\tRoof Works\tTT_Task\tTK_NotStart\t\t\t\t\t2026-11-11 08:00\t2026-12-20 17:00\t2026-10-21 08:00\t2026-11-25 17:00\t-80\t224\t224",
+    "%R\t7\t1000\t500\tA1060\tCurtain Wall\tTT_Task\tTK_NotStart\tCS_MANDFIN\t2026-11-30 17:00\t\t\t2026-09-01 08:00\t2026-11-30 17:00\t2026-08-15 08:00\t2026-11-15 17:00\t16\t480\t480",
+    "%R\t8\t1000\t500\tA1070\tMEP Rough-in\tTT_Task\tTK_Active\t\t\t2026-07-20 08:00\t\t2026-07-20 08:00\t2026-10-15 17:00\t2026-06-15 08:00\t2026-09-30 17:00\t64\t400\t480",
+    "%R\t9\t1000\t500\tA1080\tInteriors Fit-out\tTT_Task\tTK_NotStart\t\t\t\t\t2026-10-16 08:00\t2026-12-10 17:00\t2026-10-01 08:00\t2026-11-30 17:00\t120\t320\t320",
+    "%R\t10\t1000\t500\tA1090\tCommissioning\tTT_Task\tTK_NotStart\t\t\t\t\t2026-12-11 08:00\t2026-12-28 17:00\t2026-12-01 08:00\t2026-12-20 17:00\t24\t96\t96",
+    "%R\t11\t1000\t500\tA1100\tProject Complete\tTT_FinMile\tTK_NotStart\t\t\t\t\t2026-12-28 17:00\t2026-12-28 17:00\t2026-12-20 17:00\t2026-12-20 17:00\t24\t0\t0",
+    "%R\t12\t1000\t500\tA1110\tExcavation\tTT_Task\tTK_NotStart\t\t\t\t\t2026-06-15 08:00\t2026-08-01 17:00\t2026-06-01 08:00\t2026-07-15 17:00\t560\t256\t256",
+    "%T\tTASKPRED",
+    "%F\ttask_pred_id\ttask_id\tpred_task_id\tproj_id\tpred_proj_id\tpred_type\tlag_hr_cnt",
+    "%R\t101\t2\t1\t1000\t1000\tPR_FS\t0",
+    "%R\t102\t3\t2\t1000\t1000\tPR_FS\t0",
+    "%R\t103\t4\t3\t1000\t1000\tPR_FS\t-40",
+    "%R\t104\t5\t4\t1000\t1000\tPR_SS\t160",
+    "%R\t105\t6\t5\t1000\t1000\tPR_FS\t80",
+    "%R\t106\t7\t4\t1000\t1000\tPR_SF\t0",
+    "%R\t107\t9\t7\t1000\t1000\tPR_FS\t80",
+    "%R\t108\t10\t9\t1000\t1000\tPR_FS\t0",
+    "%R\t109\t11\t10\t1000\t1000\tPR_FS\t0",
+    "%R\t110\t10\t6\t1000\t1000\tPR_FS\t0",
+    "%E"
+  ].join("\n");
+
+  function loadSample() {
+    sourceName = "Sample — seeded-defects.xer";
+    loadXER(SAMPLE_XER);
+  }
+
+  $("btn-sample").addEventListener("click", loadSample);
+  $("btn-sample-2").addEventListener("click", loadSample);
+  </script>
+</body>
+</html>
