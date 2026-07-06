@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI in Construction — A Field Playbook</title>
+  <meta name="description" content="Where AI actually helps in construction project controls, where it doesn't, and how to train a planning team to use it well. Notes from live projects, not a vendor pitch.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #0f0e0c;
+      --paper-raise: #16140f;
+      --ink: #ebe6da;
+      --muted: #8d867a;
+      --accent: #ff4d00;
+      --green: #4caf7d;
+      --red: #e05252;
+      --line: #2c2822;
+      --line-strong: #453f35;
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+      --sans: 'Space Grotesk', -apple-system, sans-serif;
+      --serif: 'Instrument Serif', Georgia, serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body { background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--accent); color: var(--paper); }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+
+    em.serif { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); text-transform: none; }
+
+    .topbar {
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; height: 58px; gap: 16px; }
+    .mark { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .mark .dot { width: 8px; height: 8px; background: var(--accent); }
+    .mark .sub { color: var(--muted); }
+
+    .back {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); text-decoration: none;
+    }
+    .back:hover { color: var(--accent); }
+
+    /* hero */
+    header { padding: 88px 0 64px; border-bottom: 1px solid var(--line); }
+
+    .kicker {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 22px; display: flex; align-items: center; gap: 12px;
+    }
+    .kicker::before { content: ""; width: 40px; height: 1px; background: var(--accent); }
+
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 4.4rem); font-weight: 600;
+      text-transform: uppercase; letter-spacing: -0.03em; line-height: 1.02; margin-bottom: 26px;
+    }
+
+    .hero-sub { color: var(--muted); max-width: 640px; font-size: 1.05rem; }
+    .hero-sub strong { color: var(--ink); font-weight: 600; }
+
+    /* sections */
+    section { padding: 88px 0; border-bottom: 1px solid var(--line); }
+
+    .sec-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 48px; gap: 20px; flex-wrap: wrap; }
+    h2 { font-size: clamp(1.5rem, 3.5vw, 2.4rem); font-weight: 600; text-transform: uppercase; letter-spacing: -0.02em; line-height: 1.05; }
+    .sec-note { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+    /* use case rows */
+    .uc-row {
+      display: grid; grid-template-columns: 60px 1fr 1.3fr;
+      gap: 28px; padding: 30px 8px;
+      border-top: 1px solid var(--line);
+      transition: background 0.25s, padding-left 0.25s;
+    }
+    .uc-row:last-of-type { border-bottom: 1px solid var(--line); }
+    .uc-row:hover { background: var(--paper-raise); padding-left: 22px; }
+
+    .uc-num { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+    .uc-name { font-size: 1.2rem; font-weight: 600; margin-bottom: 10px; }
+
+    .uc-io { font-family: var(--mono); font-size: 11.5px; line-height: 2; letter-spacing: 0.02em; }
+    .uc-io .in { color: var(--muted); }
+    .uc-io .out { color: var(--ink); }
+    .uc-io b { color: var(--accent); font-weight: 500; }
+
+    .uc-note { color: var(--muted); font-size: 0.92rem; }
+    .uc-note strong { color: var(--ink); font-weight: 600; }
+
+    /* limits */
+    .limit-row {
+      display: grid; grid-template-columns: 40px 1fr;
+      gap: 20px; padding: 22px 8px; border-top: 1px solid var(--line);
+      align-items: baseline;
+    }
+    .limit-row:last-of-type { border-bottom: 1px solid var(--line); }
+    .limit-mark { font-family: var(--mono); font-size: 14px; color: var(--red); }
+    .limit-row h3 { font-size: 1.02rem; font-weight: 600; margin-bottom: 4px; }
+    .limit-row p { color: var(--muted); font-size: 0.92rem; }
+
+    /* prompt patterns */
+    .prompt-card { background: var(--paper-raise); border: 1px solid var(--line); margin-bottom: 20px; }
+    .prompt-head {
+      padding: 14px 20px; border-bottom: 1px solid var(--line);
+      font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted);
+    }
+    .prompt-head b { color: var(--accent); font-weight: 500; }
+    .prompt-body {
+      padding: 20px; font-family: var(--mono); font-size: 12.5px;
+      line-height: 1.8; color: var(--ink); white-space: pre-wrap;
+      border-left: 2px solid var(--accent); margin: 16px 20px 20px;
+      background: var(--paper);
+    }
+    .prompt-why { padding: 0 20px 18px; color: var(--muted); font-size: 0.88rem; }
+
+    /* ground rules */
+    .rules { counter-reset: rule; }
+    .rule {
+      display: grid; grid-template-columns: 60px 1fr; gap: 24px;
+      padding: 26px 8px; border-top: 1px solid var(--line); align-items: baseline;
+    }
+    .rule:last-child { border-bottom: 1px solid var(--line); }
+    .rule::before {
+      counter-increment: rule;
+      content: "R." counter(rule, decimal-leading-zero);
+      font-family: var(--mono); font-size: 13px; color: var(--accent);
+    }
+    .rule h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
+    .rule p { color: var(--muted); font-size: 0.92rem; }
+    .rule strong { color: var(--ink); font-weight: 600; }
+
+    /* CTA */
+    .cta { text-align: center; padding: 100px 0; }
+    .cta p { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; }
+    .cta a {
+      font-family: var(--serif); font-style: italic;
+      font-size: clamp(1.5rem, 4.5vw, 3rem); color: var(--ink); text-decoration: none;
+      border-bottom: 2px solid transparent; transition: color 0.25s, border-color 0.25s;
+      word-break: break-all;
+    }
+    .cta a:hover { color: var(--accent); border-color: var(--accent); }
+
+    footer {
+      padding: 22px 0; font-family: var(--mono); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    footer .wrap { display: contents; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 760px) {
+      .uc-row { grid-template-columns: 40px 1fr; }
+      .uc-note { grid-column: 2; }
+      section { padding: 60px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="mark">
+        <span class="dot"></span>
+        <span>AI Field Playbook</span>
+        <span class="sub">/ SHT 06</span>
+      </div>
+      <a class="back" href="index.html">← Back to index</a>
+    </div>
+  </div>
+
+  <header>
+    <div class="wrap">
+      <p class="kicker">AI in construction — practitioner's notes</p>
+      <h1>The new tool<br><em class="serif">in the toolbox.</em></h1>
+      <p class="hero-sub">This is not a vendor pitch. I'm a project controls analyst who <strong>learned AI, put it to work on live projects, and trains my team to use it well.</strong> What follows is what actually earns its keep on a construction program — and, just as important, what doesn't.</p>
+    </div>
+  </header>
+
+  <section id="uses">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Where it earns <em class="serif">its keep</em></h2>
+        <p class="sec-note">Input → Output → The catch</p>
+      </div>
+
+      <div class="uc-row">
+        <span class="uc-num">/ 01</span>
+        <div>
+          <h3 class="uc-name">Claims &amp; correspondence drafting</h3>
+          <p class="uc-io">
+            <span class="in"><b>IN&nbsp;&nbsp;</b> delay events · window analysis results · clause references</span><br>
+            <span class="out"><b>OUT&nbsp;</b> structured first-draft EOT narrative &amp; contractual letters</span>
+          </p>
+        </div>
+        <p class="uc-note">Drafting that took days now takes hours. The analysis stays mine — the delay is proven in the program, not by the model. <strong>Every fact in the draft gets verified against the schedule before it goes anywhere.</strong></p>
+      </div>
+
+      <div class="uc-row">
+        <span class="uc-num">/ 02</span>
+        <div>
+          <h3 class="uc-name">Code on demand</h3>
+          <p class="uc-io">
+            <span class="in"><b>IN&nbsp;&nbsp;</b> a plain-English spec of a controls task</span><br>
+            <span class="out"><b>OUT&nbsp;</b> working VBA · Power Query · dashboard logic</span>
+          </p>
+        </div>
+        <p class="uc-note">This is how tools on this site got built at speed — describe the check, the transformation, the output, and iterate on working code. <strong>A planner who can spec a problem clearly can now build the tool that solves it.</strong></p>
+      </div>
+
+      <div class="uc-row">
+        <span class="uc-num">/ 03</span>
+        <div>
+          <h3 class="uc-name">Program narratives</h3>
+          <p class="uc-io">
+            <span class="in"><b>IN&nbsp;&nbsp;</b> variance tables · KPI exports · schedule health results</span><br>
+            <span class="out"><b>OUT&nbsp;</b> management-ready progress commentary</span>
+          </p>
+        </div>
+        <p class="uc-note">The weekly report's first draft writes itself from the numbers. <strong>The analyst's job moves from typing to editing</strong> — checking emphasis, adding context the data can't see, owning the conclusion.</p>
+      </div>
+
+      <div class="uc-row">
+        <span class="uc-num">/ 04</span>
+        <div>
+          <h3 class="uc-name">Contract &amp; spec navigation</h3>
+          <p class="uc-io">
+            <span class="in"><b>IN&nbsp;&nbsp;</b> a clause or spec section · a plain question</span><br>
+            <span class="out"><b>OUT&nbsp;</b> a plain-language reading, with references to verify</span>
+          </p>
+        </div>
+        <p class="uc-note">A navigation aid for FIDIC and project specs — faster than paging through PDFs. <strong>Never a substitute for reading the clause itself</strong>, and never legal advice. AI points; the engineer reads.</p>
+      </div>
+
+      <div class="uc-row">
+        <span class="uc-num">/ 05</span>
+        <div>
+          <h3 class="uc-name">Team enablement</h3>
+          <p class="uc-io">
+            <span class="in"><b>IN&nbsp;&nbsp;</b> a planning team · their real weekly workflows</span><br>
+            <span class="out"><b>OUT&nbsp;</b> planners who use AI safely and check its work</span>
+          </p>
+        </div>
+        <p class="uc-note">I train my team on live work, not theory — the workflows above, the ground rules below. <strong>The goal isn't AI enthusiasts; it's analysts whose output got faster without getting sloppier.</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="limits">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Where it <em class="serif">doesn't</em></h2>
+        <p class="sec-note">Knowing the limits is the skill</p>
+      </div>
+
+      <div class="limit-row">
+        <span class="limit-mark">✕</span>
+        <div>
+          <h3>CPM math and float calculations</h3>
+          <p>Scheduling is deterministic. P6 computes the critical path; a language model guesses at it. Never ask AI to calculate what a scheduling engine calculates — ask it to explain, summarize, or draft around results you already trust.</p>
+        </div>
+      </div>
+
+      <div class="limit-row">
+        <span class="limit-mark">✕</span>
+        <div>
+          <h3>Anything you can't verify</h3>
+          <p>Models fabricate clause numbers, standards references, and plausible-sounding figures. If you can't check the output against a source you control, the output is a liability, not a deliverable.</p>
+        </div>
+      </div>
+
+      <div class="limit-row">
+        <span class="limit-mark">✕</span>
+        <div>
+          <h3>Confidential project data in public tools</h3>
+          <p>Programs, rates, and claim strategies are commercially sensitive. Nothing confidential goes into a tool without an appropriate data agreement — anonymize, aggregate, or keep it local.</p>
+        </div>
+      </div>
+
+      <div class="limit-row">
+        <span class="limit-mark">✕</span>
+        <div>
+          <h3>Replacing judgment</h3>
+          <p>AI drafts the letter; it doesn't decide whether to send it. Which delay to claim, how to sequence a recovery, what to concede in negotiation — that's the analyst's job, and signing your name to unreviewed AI output is how credibility dies.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="patterns">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Prompt patterns <em class="serif">for planners</em></h2>
+        <p class="sec-note">A prompt is a spec — write it like one</p>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head"><b>PATTERN 01</b> — Delay narrative from analysis results</div>
+        <div class="prompt-body">You are drafting a section of an EOT claim. Using only the facts below, write a chronological delay narrative for [event]. Do not invent dates, durations, or causes. Where a fact is missing, insert [VERIFY].
+
+Facts:
+- Baseline finish of activity A1040: [date]
+- Instruction [ref] received: [date]
+- Time-impact analysis result: [X] days on the critical path
+- Affected activities: [list]</div>
+        <p class="prompt-why">Why it works: the model gets facts, not freedom. The [VERIFY] instruction turns hallucination risk into a visible checklist.</p>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head"><b>PATTERN 02</b> — Tool spec to working code</div>
+        <div class="prompt-body">Write an Excel VBA macro. Input: a sheet named "XER_TASK" with columns [list columns]. Output: a new sheet listing every activity with total float above 44 days, sorted descending. Rules: skip completed activities; convert float from hours to days using column [x]; format the output as a table. Ask me questions before writing if anything is ambiguous.</div>
+        <p class="prompt-why">Why it works: inputs, outputs, rules, edge cases — the same way you'd brief a junior. "Ask before writing" catches bad assumptions early.</p>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head"><b>PATTERN 03</b> — Update summary for management</div>
+        <div class="prompt-body">Summarize this progress data for a monthly report to senior management. Audience: non-planners. Length: 150 words. Lead with overall status, then the two most significant variances, then the key risk for next period. Neutral tone — no adjectives the data doesn't support.
+
+[paste variance table]</div>
+        <p class="prompt-why">Why it works: audience, length, structure, and tone are pinned down. The model formats; the data speaks.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Ground rules <em class="serif">I train on</em></h2>
+        <p class="sec-note">Faster without sloppier</p>
+      </div>
+
+      <div class="rules">
+        <div class="rule">
+          <div>
+            <h3>Verify against the source, every time</h3>
+            <p>AI output is a draft, not a deliverable. Every date against the program, every clause against the contract, every figure against the export. <strong>If you didn't check it, you didn't do it.</strong></p>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <h3>Privacy before productivity</h3>
+            <p>Decide what's shareable before opening the tool, not after. Program data, rates, and claim positions stay out of public models. When in doubt, anonymize or leave it out.</p>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <h3>Prompts are specs</h3>
+            <p>Vague in, vague out. Inputs, outputs, constraints, format — brief the model the way you'd brief a junior planner, and demand questions back when the brief is unclear.</p>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <h3>Start with the boring wins</h3>
+            <p>Formatting, first drafts, code snippets, summaries. Build the verification habit on low-stakes work before pointing AI at a claim. <strong>Trust is earned by the workflow, not by the tool.</strong></p>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <h3>Own the output</h3>
+            <p>Whatever leaves your desk carries your name, not the model's. AI is leverage on judgment — never a substitute for it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta">
+    <p>Want this capability in your team? —</p>
+    <a href="mailto:omabdulkarim6@gmail.com">omabdulkarim6@gmail.com</a>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <span>AI Field Playbook — part of the Field Index</span>
+      <span><a href="index.html">← Back to index</a></span>
+    </div>
+  </footer>
+</body>
+</html>

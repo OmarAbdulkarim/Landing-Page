@@ -503,6 +503,50 @@
 
     .proj-link:hover { color: var(--ink); border-color: var(--ink); }
 
+    /* ================= AI SECTION ================= */
+    .ai-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .ai-card {
+      background: var(--paper-raise);
+      border: 1px solid var(--line);
+      padding: 26px;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .ai-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+    .ai-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      display: block;
+      margin-bottom: 14px;
+    }
+
+    .ai-card h3 { font-size: 1.08rem; font-weight: 600; margin-bottom: 12px; }
+
+    .ai-io {
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.9;
+      letter-spacing: 0.02em;
+      margin-bottom: 12px;
+    }
+
+    .ai-io .in { color: var(--muted); display: block; }
+    .ai-io .out { color: var(--ink); display: block; }
+    .ai-io b { color: var(--accent); font-weight: 500; }
+
+    .ai-card p.note { color: var(--muted); font-size: 0.88rem; }
+
+    .ai-cta-row { display: flex; justify-content: flex-start; }
+
     /* ================= STATS ================= */
     .stats {
       display: grid;
@@ -723,6 +767,7 @@
       <ul class="nav-links">
         <li><a href="#disciplines">Skills</a></li>
         <li><a href="#projects">Projects</a></li>
+        <li><a href="#ai">AI</a></li>
         <li><a href="#contact">Contact</a></li>
         <li><a class="nav-mail" href="mailto:omabdulkarim6@gmail.com">omabdulkarim6@gmail.com</a></li>
       </ul>
@@ -848,6 +893,60 @@
         <p class="sec-note" id="proj-count">— entries on file</p>
       </div>
       <div class="proj-index" id="proj-index"></div>
+    </div>
+  </section>
+
+  <section id="ai">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <h2>AI, <em class="serif">on site</em></h2>
+        </div>
+        <p class="sec-note">Learned → Implemented → Training the team</p>
+      </div>
+
+      <div class="ai-grid">
+        <div class="ai-card reveal">
+          <span class="ai-tag">AI / 01</span>
+          <h3>Claims &amp; correspondence drafting</h3>
+          <p class="ai-io">
+            <span class="in"><b>IN&nbsp;&nbsp;</b> delay events + window analysis results</span>
+            <span class="out"><b>OUT&nbsp;</b> first-draft EOT narrative</span>
+          </p>
+          <p class="note">Days of drafting become hours. The analysis stays human — every fact is verified against the program.</p>
+        </div>
+        <div class="ai-card reveal">
+          <span class="ai-tag">AI / 02</span>
+          <h3>Code on demand</h3>
+          <p class="ai-io">
+            <span class="in"><b>IN&nbsp;&nbsp;</b> a plain-English tool spec</span>
+            <span class="out"><b>OUT&nbsp;</b> working VBA · Power Query · JS</span>
+          </p>
+          <p class="note">How the tools on this page got built at speed — spec the problem clearly, iterate on working code.</p>
+        </div>
+        <div class="ai-card reveal">
+          <span class="ai-tag">AI / 03</span>
+          <h3>Program narratives</h3>
+          <p class="ai-io">
+            <span class="in"><b>IN&nbsp;&nbsp;</b> variance tables + KPI exports</span>
+            <span class="out"><b>OUT&nbsp;</b> management-ready commentary</span>
+          </p>
+          <p class="note">The weekly report drafts itself from the numbers. The analyst edits, adds context, owns the conclusion.</p>
+        </div>
+        <div class="ai-card reveal">
+          <span class="ai-tag">AI / 04</span>
+          <h3>Team enablement</h3>
+          <p class="ai-io">
+            <span class="in"><b>IN&nbsp;&nbsp;</b> a planning team + real workflows</span>
+            <span class="out"><b>OUT&nbsp;</b> planners who use AI safely</span>
+          </p>
+          <p class="note">Trained on live work, not theory — with ground rules: verify everything, protect project data, own the output.</p>
+        </div>
+      </div>
+
+      <div class="ai-cta-row">
+        <a class="hero-cta" href="ai-in-construction.html">Open the field playbook →</a>
+      </div>
     </div>
   </section>
 
