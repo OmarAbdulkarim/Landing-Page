@@ -110,6 +110,14 @@
 
     .nav-links a:hover { color: var(--paper); background: var(--accent); }
 
+    .nav-links a.nav-mail {
+      text-transform: none;
+      letter-spacing: 0.02em;
+      color: var(--accent);
+    }
+
+    .nav-links a.nav-mail:hover { color: var(--paper); }
+
     /* ================= HERO ================= */
     header {
       min-height: 100vh;
@@ -332,7 +340,7 @@
     /* ================= DISCIPLINES ================= */
     .disc-row {
       display: grid;
-      grid-template-columns: 90px 1fr 1.2fr 32px;
+      grid-template-columns: 90px 1fr 1.2fr 120px 32px;
       gap: 24px;
       align-items: center;
       padding: 34px 8px;
@@ -376,6 +384,14 @@
 
     .disc-row:hover .disc-arrow { color: var(--accent); transform: translateX(4px); }
 
+    .disc-viz { width: 110px; height: 44px; opacity: 0.75; transition: opacity 0.25s; }
+    .disc-viz svg { width: 100%; height: 100%; display: block; }
+    .disc-row:hover .disc-viz { opacity: 1; }
+
+    .proj-viz { width: 90px; height: 36px; opacity: 0.7; transition: opacity 0.2s; }
+    .proj-viz svg { width: 100%; height: 100%; display: block; }
+    .proj-summary:hover .proj-viz { opacity: 1; }
+
     /* ================= PROJECTS ================= */
     .proj-index {
       border-top: 1px solid var(--line);
@@ -387,7 +403,7 @@
 
     .proj-summary {
       display: grid;
-      grid-template-columns: 70px 1.6fr 1fr 120px 32px;
+      grid-template-columns: 70px 1.5fr 0.9fr 100px 90px 32px;
       gap: 20px;
       align-items: center;
       padding: 26px 8px;
@@ -695,9 +711,9 @@
       .nav-links a { padding: 0 12px; }
       .hero-meta { display: none; }
       .disc-row { grid-template-columns: 48px 1fr 24px; }
-      .disc-desc { display: none; }
+      .disc-desc, .disc-viz { display: none; }
       .proj-summary { grid-template-columns: 48px 1fr 24px; }
-      .proj-cat, .proj-year { display: none; }
+      .proj-cat, .proj-year, .proj-viz { display: none; }
       .proj-detail-inner { padding-left: 8px; flex-direction: column; gap: 24px; }
       .stats { grid-template-columns: 1fr; }
       .approach { grid-template-columns: 1fr; gap: 40px; }
@@ -714,6 +730,7 @@
         <li><a href="#disciplines">Skills</a></li>
         <li><a href="#projects">Projects</a></li>
         <li><a href="#contact">Contact</a></li>
+        <li><a class="nav-mail" href="mailto:omabdulkarim6@gmail.com">omabdulkarim6@gmail.com</a></li>
       </ul>
     </div>
   </nav>
@@ -762,24 +779,56 @@
         <span class="disc-num">/ 01</span>
         <span class="disc-name">Schedule Analysis</span>
         <span class="disc-desc">Baselines, critical paths, and program health checks across a live portfolio — finding the slippage before it finds the completion date.</span>
+        <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="5" width="34" height="6" fill="#453f35"/>
+          <rect x="22" y="14" width="42" height="6" fill="#453f35"/>
+          <rect x="40" y="23" width="30" height="6" fill="#ff4d00"/>
+          <rect x="56" y="32" width="46" height="6" fill="#453f35"/>
+          <line x1="66" y1="2" x2="66" y2="42" stroke="#ebe6da" stroke-width="1" stroke-dasharray="2 3" opacity="0.55"/>
+        </svg></span>
         <span class="disc-arrow">→</span>
       </div>
       <div class="disc-row reveal">
         <span class="disc-num">/ 02</span>
         <span class="disc-name">Delay &amp; Claims</span>
         <span class="disc-desc">Extension of Time claims built on Time-Impact, Window, and Impacted-as-Planned analysis — evidence first, argument second.</span>
+        <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="9" width="56" height="7" fill="#453f35"/>
+          <rect x="2" y="24" width="56" height="7" fill="#453f35" opacity="0.45"/>
+          <rect x="58" y="24" width="30" height="7" fill="#ff4d00"/>
+          <line x1="58" y1="4" x2="58" y2="40" stroke="#8d867a" stroke-width="1" stroke-dasharray="2 3"/>
+          <text x="63" y="19" font-family="IBM Plex Mono, monospace" font-size="8" fill="#ff4d00" letter-spacing="1">+EOT</text>
+        </svg></span>
         <span class="disc-arrow">→</span>
       </div>
       <div class="disc-row reveal">
         <span class="disc-num">/ 03</span>
         <span class="disc-name">Reporting &amp; Dashboards</span>
         <span class="disc-desc">Weekly and monthly management dashboards that turn raw program updates into progress, risk, and KPI visibility.</span>
+        <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
+          <line x1="2" y1="40" x2="108" y2="40" stroke="#2c2822"/>
+          <rect x="10" y="28" width="12" height="12" fill="#453f35"/>
+          <rect x="30" y="22" width="12" height="18" fill="#453f35"/>
+          <rect x="50" y="26" width="12" height="14" fill="#453f35"/>
+          <rect x="70" y="14" width="12" height="26" fill="#453f35"/>
+          <rect x="90" y="6" width="12" height="34" fill="#ff4d00"/>
+        </svg></span>
         <span class="disc-arrow">→</span>
       </div>
       <div class="disc-row reveal">
         <span class="disc-num">/ 04</span>
         <span class="disc-name">Tooling &amp; Automation</span>
         <span class="disc-desc">Power Query, VBA, and macro tools that replace manual controls work — built once, then adopted by the whole team.</span>
+        <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="17" width="10" height="10" fill="#453f35"/>
+          <line x1="14" y1="22" x2="34" y2="22" stroke="#8d867a" stroke-dasharray="3 3"/>
+          <rect x="34" y="17" width="10" height="10" fill="#453f35"/>
+          <line x1="44" y1="22" x2="64" y2="22" stroke="#8d867a" stroke-dasharray="3 3"/>
+          <rect x="64" y="17" width="10" height="10" fill="#453f35"/>
+          <line x1="74" y1="22" x2="94" y2="22" stroke="#8d867a" stroke-dasharray="3 3"/>
+          <rect x="94" y="17" width="10" height="10" fill="#ff4d00"/>
+          <text x="32" y="11" font-family="IBM Plex Mono, monospace" font-size="8" fill="#8d867a">{ }</text>
+        </svg></span>
         <span class="disc-arrow">→</span>
       </div>
     </div>
@@ -815,7 +864,7 @@
   <section id="contact">
     <div class="wrap">
       <p class="contact-kicker">Contact — open for inquiries</p>
-      <a class="email-link" href="mailto:omarsoubhi@gmail.com">omarsoubhi@gmail.com</a>
+      <a class="email-link" href="mailto:omabdulkarim6@gmail.com">omabdulkarim6@gmail.com</a>
     </div>
   </section>
 
@@ -936,6 +985,7 @@
         year: "2026",
         description: "Upload a Primavera P6 XER and get an instant DCMA 14-point assessment plus additional weakness checks — open logic, leads and lags, hard constraints, high and negative float, invalid dates, SF relationships, duplicate activities, actual-date consistency. Every failed check lists the exact offending activities, exportable to CSV. Reads the XER's own CPM results, fully client-side, and honest about its limits: checks that can't be automated from a static file are flagged for manual review, not faked.",
         tech: ["JavaScript", "XER parsing", "DCMA 14-point"],
+        viz: "audit",
         link: "schedule-auditor.html"
       },
       {
@@ -944,6 +994,7 @@
         year: "2026",
         description: "Drop in any CSV or Excel export from a scheduling or cost system and get an instant project dashboard: budget-weighted completion, cost S-curve, CPI, budget vs actual by phase, a phase timeline, and a full task register. Columns are auto-detected and remappable, so it works with real-world exports, not just clean data. Fully client-side — sensitive project data never leaves the browser.",
         tech: ["JavaScript", "Chart.js", "PapaParse", "SheetJS"],
+        viz: "dash",
         link: "construction-dashboard.html"
       },
       {
@@ -952,6 +1003,7 @@
         year: "2025",
         description: "Power Query tool that automatically detects every logical error in a construction program — open ends, broken logic, lag abuse — replicating the functionality of paid commercial schedule-checking software at zero cost. Adopted across the planning team as the standard pre-submission check, with training delivered to the team.",
         tech: ["Power Query", "Excel"],
+        viz: "check",
         link: null
       },
       {
@@ -960,6 +1012,7 @@
         year: "2025",
         description: "Productivity-driven tool that takes an activity list and productivity rates as inputs and outputs a fully resource-loaded schedule. Cut a 2-day manual loading process to under one hour.",
         tech: ["Excel", "VBA"],
+        viz: "load",
         link: null
       },
       {
@@ -968,11 +1021,59 @@
         year: "2024",
         description: "A set of custom Excel macros that transform raw Primavera P6 schedule updates into visually structured management dashboards — from XER export to board-ready visuals without manual formatting.",
         tech: ["VBA", "Primavera P6"],
+        viz: "macro",
         link: null
       }
     ];
 
     // Build the index table
+    // mini-graphs matched to each tool
+    const VIZ = {
+      audit: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="6" width="30" height="5" fill="#453f35"/>
+        <rect x="14" y="15" width="36" height="5" fill="#453f35"/>
+        <rect x="30" y="24" width="30" height="5" fill="#453f35"/>
+        <circle cx="56" cy="17" r="10" fill="none" stroke="#ff4d00" stroke-width="1.5"/>
+        <line x1="63" y1="25" x2="72" y2="33" stroke="#ff4d00" stroke-width="1.5"/>
+      </svg>`,
+      dash: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="11" fill="none" stroke="#453f35" stroke-width="5"/>
+        <circle cx="18" cy="18" r="11" fill="none" stroke="#ff4d00" stroke-width="5" stroke-dasharray="24 45" transform="rotate(-90 18 18)"/>
+        <polyline points="38,28 50,20 60,24 72,10 84,8" fill="none" stroke="#8d867a" stroke-width="1.5"/>
+        <circle cx="84" cy="8" r="2.5" fill="#ff4d00"/>
+      </svg>`,
+      check: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="6" width="9" height="9" fill="#453f35"/>
+        <rect x="40" y="6" width="9" height="9" fill="#453f35"/>
+        <rect x="76" y="6" width="9" height="9" fill="#453f35"/>
+        <line x1="13" y1="10" x2="40" y2="10" stroke="#8d867a"/>
+        <line x1="49" y1="10" x2="76" y2="10" stroke="#ff4d00" stroke-dasharray="3 3"/>
+        <text x="58" y="31" font-family="IBM Plex Mono, monospace" font-size="9" fill="#ff4d00">✕</text>
+        <text x="4" y="31" font-family="IBM Plex Mono, monospace" font-size="7" fill="#8d867a" letter-spacing="1">LOGIC ERR</text>
+      </svg>`,
+      load: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
+        <line x1="2" y1="32" x2="88" y2="32" stroke="#2c2822"/>
+        <rect x="6" y="22" width="10" height="10" fill="#453f35"/>
+        <rect x="22" y="16" width="10" height="16" fill="#453f35"/>
+        <rect x="38" y="10" width="10" height="22" fill="#ff4d00"/>
+        <rect x="54" y="14" width="10" height="18" fill="#453f35"/>
+        <rect x="70" y="24" width="10" height="8" fill="#453f35"/>
+        <path d="M 6 20 Q 30 2 44 8 Q 62 12 80 22" fill="none" stroke="#8d867a" stroke-width="1" stroke-dasharray="2 2"/>
+      </svg>`,
+      macro: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#453f35" stroke-width="2">
+          <line x1="4" y1="10" x2="30" y2="10"/>
+          <line x1="4" y1="18" x2="30" y2="18"/>
+          <line x1="4" y1="26" x2="30" y2="26"/>
+        </g>
+        <path d="M 38 18 h 12 m 0 0 l -4 -4 m 4 4 l -4 4" stroke="#ff4d00" stroke-width="1.5" fill="none"/>
+        <rect x="58" y="16" width="7" height="12" fill="#453f35"/>
+        <rect x="68" y="8" width="7" height="20" fill="#ff4d00"/>
+        <rect x="78" y="20" width="7" height="8" fill="#453f35"/>
+        <line x1="56" y1="28" x2="88" y2="28" stroke="#2c2822"/>
+      </svg>`
+    };
+
     const idx = document.getElementById("proj-index");
     projects.forEach((p, i) => {
       const row = document.createElement("div");
@@ -982,6 +1083,7 @@
           <span class="proj-id">${String(i + 1).padStart(3, "0")}</span>
           <span class="proj-title">${p.title}</span>
           <span class="proj-cat">${p.category}</span>
+          <span class="proj-viz">${VIZ[p.viz] || ""}</span>
           <span class="proj-year">${p.year}</span>
           <span class="proj-toggle">+</span>
         </div>
