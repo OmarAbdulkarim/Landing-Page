@@ -490,7 +490,7 @@
     /* ================= STATS ================= */
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       border-top: 1px solid var(--line);
       border-left: 1px solid var(--line);
     }
@@ -603,6 +603,85 @@
     .foot-inner a { color: var(--muted); text-decoration: none; }
     .foot-inner a:hover { color: var(--accent); }
 
+    /* ================= CLOSING ANIMATION ================= */
+    .viz-sec { padding: 80px 0; border-bottom: 1px solid var(--line); background: var(--paper-raise); }
+
+    .viz-head {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .viz-head .live { color: var(--accent); }
+
+    .viz-frame {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      overflow: hidden;
+    }
+
+    .viz-frame svg { display: block; width: 100%; height: auto; }
+
+    .gbar {
+      transform-box: fill-box;
+      transform-origin: left center;
+      animation: barGrow 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes barGrow {
+      0%   { transform: scaleX(0); opacity: 0; }
+      4%   { opacity: 1; }
+      16%  { transform: scaleX(1); }
+      82%  { transform: scaleX(1); opacity: 1; }
+      92%  { transform: scaleX(1); opacity: 0; }
+      100% { transform: scaleX(0); opacity: 0; }
+    }
+
+    .scurve {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: curveDraw 12s ease-in-out infinite;
+    }
+
+    @keyframes curveDraw {
+      0%   { stroke-dashoffset: 100; opacity: 1; }
+      12%  { stroke-dashoffset: 100; }
+      70%  { stroke-dashoffset: 0; }
+      88%  { stroke-dashoffset: 0; opacity: 1; }
+      94%  { opacity: 0; }
+      100% { stroke-dashoffset: 100; opacity: 0; }
+    }
+
+    .ddline { animation: ddSweep 12s linear infinite; }
+
+    @keyframes ddSweep {
+      0%   { transform: translateX(0); opacity: 0; }
+      8%   { opacity: 0.7; }
+      75%  { transform: translateX(950px); opacity: 0.7; }
+      88%  { transform: translateX(950px); opacity: 0; }
+      100% { transform: translateX(0); opacity: 0; }
+    }
+
+    .fin-mile { animation: milePulse 2.4s ease-in-out infinite; }
+
+    @keyframes milePulse {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .gbar, .scurve, .ddline, .fin-mile { animation: none; }
+      .gbar { transform: scaleX(1); opacity: 1; }
+      .scurve { stroke-dashoffset: 0; }
+      .ddline { transform: translateX(475px); opacity: 0.7; }
+      .ticker-track { animation: none; }
+    }
+
     /* ================= REVEAL ================= */
     .reveal {
       opacity: 0;
@@ -632,9 +711,8 @@
     <div class="wrap nav-inner">
       <a class="nav-mark" href="#top"><span class="dot"></span>Field Index</a>
       <ul class="nav-links">
-        <li><a href="#disciplines">Disciplines</a></li>
+        <li><a href="#disciplines">Skills</a></li>
         <li><a href="#projects">Projects</a></li>
-        <li><a href="#approach">Approach</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </div>
@@ -657,10 +735,9 @@
         <span class="row">Baselines that</span>
         <span class="row indent"><em class="serif">hold.</em> Claims that</span>
         <span class="row"><em class="serif">land.</em> Data that</span>
-        <span class="row indent">decides.</span>
+        <span class="row indent"><em class="serif">decides.</em></span>
       </h1>
       <div class="hero-foot">
-        <p class="hero-sub">Project controls analyst. I read construction programs the way auditors read books — baselines, critical paths, delay events, cost data — and turn them into dashboards, claims, and decisions management can act on.</p>
         <a class="hero-cta" href="#projects">Open the index ↓</a>
       </div>
     </div>
@@ -668,7 +745,7 @@
 
   <div class="ticker" aria-hidden="true">
     <div class="ticker-track" id="ticker-track">
-      <span>Primavera P6 <b>✦</b></span><span>CPM <b>✦</b></span><span>Baselines <b>✦</b></span><span>EOT Claims <b>✦</b></span><span>Time-Impact Analysis <b>✦</b></span><span>Earned Value <b>✦</b></span><span>Power Query <b>✦</b></span><span>VBA <b>✦</b></span><span>Power BI <b>✦</b></span><span>Dashboards <b>✦</b></span>
+      <span>Primavera P6 <b>✦</b></span><span>CPM <b>✦</b></span><span>Baselines <b>✦</b></span><span>EOT Claims <b>✦</b></span><span>Time-Impact Analysis <b>✦</b></span><span>Earned Value <b>✦</b></span><span>Power Query <b>✦</b></span><span>VBA <b>✦</b></span><span>Power BI <b>✦</b></span><span>Dashboards <b>✦</b></span><span>Data Analysis <b>✦</b></span><span>Planning <b>✦</b></span><span>Big Data <b>✦</b></span><span>AI Integration <b>✦</b></span>
     </div>
   </div>
 
@@ -676,8 +753,7 @@
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <p class="sec-num">SEC. 01 — Practice</p>
-          <h2>One trade: <em class="serif">analysis</em></h2>
+          <h2>Skills</h2>
         </div>
         <p class="sec-note">Read → Model → Prove → Report</p>
       </div>
@@ -713,8 +789,7 @@
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <p class="sec-num">SEC. 02 — Project Index</p>
-          <h2>Tools built <em class="serif">on the job</em></h2>
+          <h2>Project <em class="serif">index</em></h2>
         </div>
         <p class="sec-note" id="proj-count">— entries on file</p>
       </div>
@@ -733,37 +808,110 @@
           <span class="num">30M+</span>
           <span class="lbl">AED in approved delay claims</span>
         </div>
-        <div class="stat reveal">
-          <span class="num">80M</span>
-          <span class="lbl">AED avg. project value under control</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="approach">
-    <div class="wrap">
-      <div class="sec-head">
-        <div>
-          <p class="sec-num">SEC. 03 — Approach</p>
-          <h2>Behind <em class="serif">the work</em></h2>
-        </div>
-      </div>
-      <div class="approach">
-        <p class="pull reveal">"The program already knows where the project is going — <b>someone has to read it.</b>"</p>
-        <div class="approach-text reveal">
-          <p>This practice sits where <strong>project controls meets data analysis</strong> — the point where a construction program stops being a schedule and starts being evidence.</p>
-          <p>The pattern repeats on every project: an update hiding slippage, a delay nobody can prove, a report that eats two days a week. Those become <strong>analyses that survive scrutiny and tools the whole team adopts</strong> — schedule checkers, resource loaders, dashboard engines.</p>
-          <p>The method doesn't change: read the data deeply, keep the output simple, and make sure it holds up in front of the client, the engineer, and the auditor.</p>
-        </div>
       </div>
     </div>
   </section>
 
   <section id="contact">
     <div class="wrap">
-      <p class="contact-kicker">SEC. 04 — Contact / open for inquiries</p>
+      <p class="contact-kicker">Contact — open for inquiries</p>
       <a class="email-link" href="mailto:omarsoubhi@gmail.com">omarsoubhi@gmail.com</a>
+    </div>
+  </section>
+
+  <section class="viz-sec" aria-hidden="true">
+    <div class="wrap">
+      <div class="viz-head">
+        <span>// the work — a program building itself</span>
+        <span class="live">● live · looping</span>
+      </div>
+      <div class="viz-frame">
+        <svg viewBox="0 0 1200 430" xmlns="http://www.w3.org/2000/svg" role="img">
+          <!-- background grid -->
+          <g stroke="#2c2822" stroke-width="1" opacity="0.45">
+            <line x1="90"   y1="40" x2="90"   y2="400"/>
+            <line x1="240"  y1="40" x2="240"  y2="400"/>
+            <line x1="390"  y1="40" x2="390"  y2="400"/>
+            <line x1="540"  y1="40" x2="540"  y2="400"/>
+            <line x1="690"  y1="40" x2="690"  y2="400"/>
+            <line x1="840"  y1="40" x2="840"  y2="400"/>
+            <line x1="990"  y1="40" x2="990"  y2="400"/>
+            <line x1="1140" y1="40" x2="1140" y2="400"/>
+            <line x1="30" y1="400" x2="1170" y2="400"/>
+          </g>
+
+          <!-- legend -->
+          <g font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="1">
+            <rect x="90" y="24" width="10" height="10" fill="#ff4d00"/>
+            <text x="106" y="33" fill="#8d867a">CRITICAL PATH</text>
+            <rect x="210" y="24" width="10" height="10" fill="#453f35"/>
+            <text x="226" y="33" fill="#8d867a">NEAR-CRITICAL</text>
+            <text x="1170" y="33" fill="#8d867a" text-anchor="end">EARNED VALUE ▲</text>
+          </g>
+
+          <!-- activity ID labels -->
+          <g font-family="IBM Plex Mono, monospace" font-size="9" fill="#8d867a">
+            <text x="34" y="82">A100</text>
+            <text x="34" y="118">A110</text>
+            <text x="34" y="154">A120</text>
+            <text x="34" y="190">A130</text>
+            <text x="34" y="226">A140</text>
+            <text x="34" y="262">A150</text>
+            <text x="34" y="298">A160</text>
+            <text x="34" y="334">A170</text>
+            <text x="34" y="370">A180</text>
+          </g>
+
+          <!-- gantt bars: cascading, critical path in accent -->
+          <g>
+            <rect class="gbar" style="animation-delay:0s"    x="90"  y="70"  width="150" height="16" fill="#ff4d00"/>
+            <rect class="gbar" style="animation-delay:0.5s"  x="180" y="106" width="130" height="16" fill="#453f35"/>
+            <rect class="gbar" style="animation-delay:1s"    x="240" y="142" width="190" height="16" fill="#ff4d00"/>
+            <rect class="gbar" style="animation-delay:1.5s"  x="310" y="178" width="120" height="16" fill="#453f35"/>
+            <rect class="gbar" style="animation-delay:2s"    x="430" y="214" width="180" height="16" fill="#ff4d00"/>
+            <rect class="gbar" style="animation-delay:2.5s"  x="490" y="250" width="150" height="16" fill="#453f35"/>
+            <rect class="gbar" style="animation-delay:3s"    x="610" y="286" width="200" height="16" fill="#ff4d00"/>
+            <rect class="gbar" style="animation-delay:3.5s"  x="700" y="322" width="160" height="16" fill="#453f35"/>
+            <rect class="gbar" style="animation-delay:4s"    x="810" y="358" width="240" height="16" fill="#ff4d00"/>
+          </g>
+
+          <!-- finish milestone -->
+          <rect class="fin-mile" x="1064" y="359" width="14" height="14" fill="#ff4d00"
+                transform="rotate(45 1071 366)"/>
+          <text x="1090" y="371" font-family="IBM Plex Mono, monospace" font-size="9"
+                fill="#ff4d00" letter-spacing="1">FINISH</text>
+
+          <!-- planned S-curve (static, dashed) -->
+          <path d="M 90 400 C 400 394 520 330 700 240 C 850 165 1000 118 1140 102"
+                fill="none" stroke="#8d867a" stroke-width="1.5"
+                stroke-dasharray="5 5" opacity="0.5"/>
+
+          <!-- actual S-curve (draws itself) -->
+          <path class="scurve" pathLength="100"
+                d="M 90 400 C 380 397 500 345 660 268 C 810 198 960 165 1140 148"
+                fill="none" stroke="#ff4d00" stroke-width="2.5"/>
+
+          <!-- progress dot riding the actual curve -->
+          <circle r="5" fill="#ff4d00">
+            <animateMotion dur="12s" repeatCount="indefinite"
+              keyPoints="0;0;1;1" keyTimes="0;0.12;0.7;1" calcMode="linear"
+              path="M 90 400 C 380 397 500 345 660 268 C 810 198 960 165 1140 148"/>
+          </circle>
+
+          <!-- curve labels -->
+          <g font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="1">
+            <text x="1146" y="100" fill="#8d867a">PLANNED</text>
+            <text x="1146" y="152" fill="#ff4d00">ACTUAL</text>
+          </g>
+
+          <!-- data-date line sweeping across -->
+          <g class="ddline">
+            <line x1="140" y1="46" x2="140" y2="404" stroke="#ebe6da" stroke-width="1" stroke-dasharray="3 4"/>
+            <text x="140" y="422" font-family="IBM Plex Mono, monospace" font-size="9"
+                  fill="#ebe6da" text-anchor="middle" letter-spacing="1">DATA DATE</text>
+          </g>
+        </svg>
+      </div>
     </div>
   </section>
 
