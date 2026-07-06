@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Controls Analyst — Schedules · Claims · Dashboards</title>
+  <title>Omar Abdulkarim — Project Controls Analyst · Schedules · Claims · Dashboards</title>
   <meta name="description" content="Project controls and data analysis: construction schedules, delay and EOT claims, management dashboards, and the tools that automate them.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -269,6 +269,80 @@
       background: var(--accent);
       border-color: var(--accent);
       color: var(--paper);
+    }
+
+    /* ================= ID / TITLE BLOCK ================= */
+    .id-block {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid var(--line-strong);
+      background: var(--paper);
+    }
+
+    .id-photo {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      display: block;
+      flex-shrink: 0;
+      border-right: 1px solid var(--line-strong);
+      overflow: hidden;
+    }
+
+    .id-photo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 20%;
+      filter: grayscale(100%) contrast(1.05);
+      transition: filter 0.35s;
+    }
+
+    .id-block:hover .id-photo img { filter: grayscale(0%) contrast(1); }
+
+    .id-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 20px;
+      color: var(--accent);
+      background: var(--paper-raise);
+    }
+
+    .id-meta {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px 20px 10px 16px;
+      line-height: 1.5;
+    }
+
+    .id-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .id-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .id-role {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
     }
 
     /* ================= TICKER ================= */
@@ -795,6 +869,17 @@
       </h1>
       <div class="hero-foot">
         <a class="hero-cta" href="#projects">Open the index ↓</a>
+        <div class="id-block">
+          <span class="id-photo">
+            <span class="id-fallback">OA</span>
+            <img src="omar.jpg" alt="Omar Abdulkarim" onerror="this.remove()">
+          </span>
+          <span class="id-meta">
+            <span class="id-label">Prepared by</span>
+            <span class="id-name">Omar Abdulkarim</span>
+            <span class="id-role">Project Controls Analyst</span>
+          </span>
+        </div>
       </div>
     </div>
   </header>
@@ -1081,7 +1166,7 @@
 
   <footer>
     <div class="wrap foot-inner">
-      <span>© <span id="year"></span> — All rights reserved</span>
+      <span>© <span id="year"></span> Omar Abdulkarim — All rights reserved</span>
       <span>SHT 01 OF 01 · REV C</span>
       <span><a href="#top">↑ Back to top</a></span>
     </div>
