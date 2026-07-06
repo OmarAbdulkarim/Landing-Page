@@ -6,6 +6,8 @@ Single-file static site. No build step, no dependencies, no name on the page.
 
 - `index.html` — the landing page
 - `schedule-auditor.html` — Schedule Auditor: upload a Primavera P6 `.xer` and get a DCMA 14-point assessment plus extra weakness checks (SF links, excessive lags, duplicate names, actual-date consistency), with per-check offender lists and CSV export. Parses the XER client-side; includes a sample schedule with seeded defects for demoing. Non-automatable checks (critical path test, exact CPLI) are marked "review" rather than guessed.
+- `time-chainage.html` — Time-Chainage Creator: enter activities with chainages and dates (or durations) in a table or CSV, get a time-location diagram — sloped lines for linear works, vertical bands for fixed-location works, trade color-coding, SVG/PNG export. Sample 5 km road project included.
+- `earned-value.html` — EV Engine: control accounts with BAC, dates, % complete, actual cost + a data date → CPI, SPI, CV/SV, EAC (three methods), VAC, TCPI, PV/EV/AC S-curves, and a per-activity performance table. Sample project included.
 - `construction-dashboard.html` — Field Dashboard, a standalone tool linked from the Projects section. Ingests any construction CSV/XLSX export (auto-detects and lets you remap columns), then renders KPIs, a cost S-curve, budget vs actual by phase, completion by trade, a phase timeline, and a task register. 100% client-side; includes a "Load sample project" mode for demoing without data. Upload both files to the same repo — the project link is relative.
 
 ## Deploy to GitHub Pages

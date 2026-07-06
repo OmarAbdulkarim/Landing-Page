@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EV Engine — Earned Value Analysis</title>
+  <meta name="description" content="Enter activities with budgets, dates, progress and actual cost — get PV/EV/AC, CPI, SPI, EAC forecasts and S-curves instantly. Fully client-side.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <style>
+    :root {
+      --paper: #0f0e0c;
+      --paper-raise: #16140f;
+      --ink: #ebe6da;
+      --muted: #8d867a;
+      --accent: #ff4d00;
+      --green: #4caf7d;
+      --amber: #e0a63a;
+      --red: #e05252;
+      --blue: #5b9bd5;
+      --line: #2c2822;
+      --line-strong: #453f35;
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+      --sans: 'Space Grotesk', -apple-system, sans-serif;
+      --serif: 'Instrument Serif', Georgia, serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body { background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+    ::selection { background: var(--accent); color: var(--paper); }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 0 28px; }
+
+    .topbar {
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; height: 58px; gap: 16px; }
+    .mark { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+    .mark .dot { width: 8px; height: 8px; background: var(--accent); }
+    .mark .sub { color: var(--muted); }
+    .topbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 9px 18px;
+      background: none; border: 1px solid var(--line-strong);
+      color: var(--ink); cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+    .btn.primary:hover { filter: brightness(1.12); color: var(--paper); }
+
+    .intro { padding: 56px 0 8px; }
+    .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
+    .kicker::before { content: ""; width: 40px; height: 1px; background: var(--accent); }
+    .title { font-size: clamp(1.8rem, 4.5vw, 3.2rem); font-weight: 600; text-transform: uppercase; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 14px; }
+    .title em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); text-transform: none; }
+    .sub { color: var(--muted); max-width: 640px; margin-bottom: 12px; }
+    .privacy { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 24px; }
+    .privacy b { color: var(--green); font-weight: 400; }
+
+    .panel { border: 1px solid var(--line); background: var(--paper-raise); margin-bottom: 32px; }
+    .panel-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px; border-bottom: 1px solid var(--line);
+      font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted); flex-wrap: wrap; gap: 10px;
+    }
+    .panel-head b { color: var(--accent); font-weight: 500; }
+    .panel-head .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .panel-head label { letter-spacing: 0.08em; }
+    .panel-head input[type="date"] {
+      background: var(--paper); color: var(--ink); border: 1px solid var(--line-strong);
+      font-family: var(--mono); font-size: 11px; padding: 6px 8px;
+    }
+
+    .table-scroll { overflow-x: auto; }
+    table.input-table { width: 100%; border-collapse: collapse; }
+    .input-table th {
+      font-family: var(--mono); font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+      text-align: left; padding: 10px; border-bottom: 1px solid var(--line-strong); white-space: nowrap;
+    }
+    .input-table td { padding: 4px 6px; border-bottom: 1px solid var(--line); }
+    .input-table input {
+      width: 100%; min-width: 90px;
+      background: var(--paper); color: var(--ink);
+      border: 1px solid transparent;
+      font-family: var(--mono); font-size: 12px; padding: 7px 8px;
+    }
+    .input-table input:focus { outline: none; border-color: var(--accent); }
+    .input-table td.rm { text-align: center; }
+    .rm button { background: none; border: none; color: var(--muted); cursor: pointer; font-family: var(--mono); font-size: 14px; }
+    .rm button:hover { color: var(--red); }
+    .panel-foot { padding: 12px 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .hint { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+    .err { font-family: var(--mono); font-size: 11px; color: var(--red); }
+
+    /* results */
+    #results { display: none; margin-bottom: 60px; }
+
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin-bottom: 28px;
+    }
+
+    .kpi { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 20px 18px; }
+    .kpi .k-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px; display: block; }
+    .kpi .k-value { font-family: var(--serif); font-style: italic; font-size: clamp(1.5rem, 2.6vw, 2.2rem); line-height: 1; display: block; }
+    .kpi .k-value.good { color: var(--green); }
+    .kpi .k-value.bad { color: var(--red); }
+    .kpi .k-value.warn { color: var(--amber); }
+    .kpi .k-value.accent { color: var(--accent); }
+    .kpi .k-sub { font-family: var(--mono); font-size: 9.5px; color: var(--muted); margin-top: 7px; display: block; }
+
+    .card { background: var(--paper-raise); border: 1px solid var(--line); padding: 22px; margin-bottom: 24px; }
+    .card h3 { font-family: var(--mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 18px; }
+    .card h3 b { color: var(--accent); font-weight: 500; }
+    .chart-box { position: relative; height: 340px; }
+
+    table.out-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .out-table th {
+      font-family: var(--mono); font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+      text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line-strong); white-space: nowrap;
+    }
+    .out-table td { padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    .out-table td.num { font-family: var(--mono); font-size: 0.78rem; }
+    .out-table tr:hover td { background: var(--paper); }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+
+    .chip { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 10px; border: 1px solid; }
+    .chip.good { color: var(--green); border-color: var(--green); }
+    .chip.bad { color: var(--red); border-color: var(--red); }
+    .chip.warn { color: var(--amber); border-color: var(--amber); }
+
+    footer {
+      border-top: 1px solid var(--line); padding: 22px 0;
+      font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    footer .wrap { display: contents; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="mark">
+        <span class="dot"></span>
+        <span>EV Engine</span>
+        <span class="sub">/ SHT 05</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn" id="btn-sample">Load sample</button>
+        <button class="btn" id="btn-csv">Import CSV</button>
+        <input type="file" id="file-input" accept=".csv" hidden>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap intro">
+    <p class="kicker">Earned value management — v1.0</p>
+    <h1 class="title">Three curves.<br><em>No opinions.</em></h1>
+    <p class="sub">List activities with budget, dates, progress, and actual cost. The engine computes PV, EV and AC, scores CPI and SPI, forecasts EAC three ways, and draws the S-curves — the version of project truth nobody can argue with.</p>
+    <p class="privacy"><b>●</b> 100% client-side · no data transmitted</p>
+  </div>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="panel-head">
+        <span><b>INPUT</b> — control account list</span>
+        <span class="actions">
+          <label>DATA DATE</label>
+          <input type="date" id="data-date">
+          <button class="btn" id="btn-add">+ Add activity</button>
+          <button class="btn" id="btn-clear">Clear</button>
+          <button class="btn primary" id="btn-run">Run analysis →</button>
+        </span>
+      </div>
+      <div class="table-scroll">
+        <table class="input-table">
+          <thead>
+            <tr>
+              <th style="min-width:190px">Activity</th>
+              <th>Budget (BAC)</th>
+              <th>Start (YYYY-MM-DD)</th>
+              <th>Finish (YYYY-MM-DD)</th>
+              <th>% Complete</th>
+              <th>Actual Cost (AC)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="panel-foot">
+        <span class="hint">PV is time-proportioned from the activity's dates to the data date. EV = % complete × BAC.</span>
+        <span class="err" id="err"></span>
+      </div>
+    </div>
+
+    <div id="results">
+      <div class="kpi-grid" id="kpi-grid"></div>
+
+      <div class="card">
+        <h3><b>01</b> — S-curves · PV / EV / AC cumulative</h3>
+        <div class="chart-box"><canvas id="ch-scurve"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h3><b>02</b> — Control account detail</h3>
+        <div class="table-scroll">
+          <table class="out-table">
+            <thead>
+              <tr>
+                <th>Activity</th><th>BAC</th><th>PV</th><th>EV</th><th>AC</th>
+                <th>CV</th><th>SV</th><th>CPI</th><th>SPI</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="out-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <span>EV Engine v1.0 — part of the Field Index toolset</span>
+      <span>Client-side only · No data transmitted</span>
+    </div>
+  </footer>
+
+  <script>
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const DAY = 86400000;
+
+  Chart.defaults.color = "#8d867a";
+  Chart.defaults.borderColor = "#2c2822";
+  Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+  Chart.defaults.font.size = 10;
+
+  let chart = null;
+
+  /* ---------------- input rows ---------------- */
+
+  function addRow(v) {
+    v = v || {};
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input data-f="name" value="${esc(v.name || "")}" placeholder="e.g. Foundations"></td>
+      <td><input data-f="bac" value="${v.bac ?? ""}" placeholder="500000"></td>
+      <td><input data-f="d1" value="${v.d1 || ""}" placeholder="2026-01-05"></td>
+      <td><input data-f="d2" value="${v.d2 || ""}" placeholder="2026-04-30"></td>
+      <td><input data-f="pct" value="${v.pct ?? ""}" placeholder="0–100"></td>
+      <td><input data-f="ac" value="${v.ac ?? ""}" placeholder="spent to date"></td>
+      <td class="rm"><button title="Remove row">✕</button></td>`;
+    tr.querySelector(".rm button").addEventListener("click", () => tr.remove());
+    $("rows").appendChild(tr);
+  }
+
+  const parseDate = s => { if (!s) return null; const d = new Date(s); return isNaN(d) ? null : d; };
+  const parseNum = s => { const n = parseFloat(String(s).replace(/[$,\s%]/g, "")); return isNaN(n) ? null : n; };
+
+  function readRows() {
+    const out = [];
+    $("rows").querySelectorAll("tr").forEach(tr => {
+      const g = f => tr.querySelector(`[data-f="${f}"]`).value.trim();
+      if (!g("name")) return;
+      out.push({
+        name: g("name"),
+        bac: parseNum(g("bac")),
+        d1: parseDate(g("d1")),
+        d2: parseDate(g("d2")),
+        pct: parseNum(g("pct")),
+        ac: parseNum(g("ac")) ?? 0
+      });
+    });
+    return out;
+  }
+
+  function validate(acts, dd) {
+    if (!dd) return "Set a data date.";
+    if (!acts.length) return "Add at least one activity.";
+    for (const a of acts) {
+      if (a.bac === null || a.bac < 0) return `"${a.name}": budget (BAC) must be a number.`;
+      if (!a.d1 || !a.d2) return `"${a.name}": start and finish dates required (YYYY-MM-DD).`;
+      if (a.d2 < a.d1) return `"${a.name}": finish is before start.`;
+      if (a.pct === null) return `"${a.name}": % complete required (0–100).`;
+    }
+    return null;
+  }
+
+  /* ---------------- EV math ---------------- */
+
+  function compute(acts, dd) {
+    const t = dd.getTime();
+    acts.forEach(a => {
+      const s = a.d1.getTime(), e = a.d2.getTime();
+      const frac = e > s ? Math.min(Math.max((t - s) / (e - s), 0), 1) : (t >= e ? 1 : 0);
+      a.pv = frac * a.bac;
+      a.pct = Math.min(Math.max(a.pct, 0), 100);
+      a.ev = a.pct / 100 * a.bac;
+      a.cv = a.ev - a.ac;
+      a.sv = a.ev - a.pv;
+      a.cpi = a.ac > 0 ? a.ev / a.ac : null;
+      a.spi = a.pv > 0 ? a.ev / a.pv : null;
+    });
+    const sum = k => acts.reduce((s, a) => s + a[k], 0);
+    const BAC = sum("bac"), PV = sum("pv"), EV = sum("ev"), AC = sum("ac");
+    const CPI = AC > 0 ? EV / AC : null;
+    const SPI = PV > 0 ? EV / PV : null;
+    const EAC_cpi = CPI ? BAC / CPI : null;
+    const EAC_ac = AC + (BAC - EV);
+    const EAC_both = (CPI && SPI) ? AC + (BAC - EV) / (CPI * SPI) : null;
+    const TCPI = (BAC - AC) > 0 ? (BAC - EV) / (BAC - AC) : null;
+    return { BAC, PV, EV, AC, CPI, SPI,
+      CV: EV - AC, SV: EV - PV,
+      EAC_cpi, EAC_ac, EAC_both,
+      ETC: EAC_cpi !== null ? EAC_cpi - AC : null,
+      VAC: EAC_cpi !== null ? BAC - EAC_cpi : null,
+      TCPI, pctComplete: BAC > 0 ? EV / BAC * 100 : 0 };
+  }
+
+  /* ---------------- curves ---------------- */
+
+  const monthKey = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+
+  function monthsBetween(a, b) {
+    const out = [];
+    const cur = new Date(a.getFullYear(), a.getMonth(), 1);
+    const stop = new Date(b.getFullYear(), b.getMonth(), 1);
+    while (cur <= stop) { out.push(monthKey(cur)); cur.setMonth(cur.getMonth() + 1); }
+    return out;
+  }
+
+  function buildCurves(acts, dd) {
+    const minD = new Date(Math.min(...acts.map(a => a.d1)));
+    const maxD = new Date(Math.max(...acts.map(a => a.d2)));
+    const months = monthsBetween(minD, maxD);
+    const pvM = Object.fromEntries(months.map(m => [m, 0]));
+    const evM = Object.fromEntries(months.map(m => [m, 0]));
+    const acM = Object.fromEntries(months.map(m => [m, 0]));
+
+    acts.forEach(a => {
+      const span = monthsBetween(a.d1, a.d2);
+      span.forEach(m => { pvM[m] += a.bac / span.length; });
+      const aEnd = a.d2 < dd ? a.d2 : dd;
+      if (a.d1 <= aEnd) {
+        const aSpan = monthsBetween(a.d1, aEnd);
+        aSpan.forEach(m => {
+          if (m in evM) { evM[m] += a.ev / aSpan.length; acM[m] += a.ac / aSpan.length; }
+        });
+      }
+    });
+
+    const cum = obj => { let s = 0; return months.map(m => (s += obj[m])); };
+    const cutoff = monthKey(dd);
+    const clip = arr => arr.map((v, i) => months[i] <= cutoff ? v : null);
+    return { months, pv: cum(pvM), ev: clip(cum(evM)), ac: clip(cum(acM)) };
+  }
+
+  /* ---------------- formatting ---------------- */
+
+  const fmtMoney = v => {
+    if (v === null || isNaN(v)) return "—";
+    const sign = v < 0 ? "-" : "";
+    const a = Math.abs(v);
+    if (a >= 1e6) return sign + "$" + (a / 1e6).toFixed(2) + "M";
+    if (a >= 1e3) return sign + "$" + (a / 1e3).toFixed(0) + "K";
+    return sign + "$" + a.toFixed(0);
+  };
+
+  const idxCls = v => v === null ? "" : v >= 1 ? "good" : v >= 0.9 ? "warn" : "bad";
+
+  /* ---------------- render ---------------- */
+
+  $("btn-run").addEventListener("click", () => {
+    const acts = readRows();
+    const dd = parseDate($("data-date").value);
+    const err = validate(acts, dd);
+    $("err").textContent = err || "";
+    if (err) return;
+
+    const r = compute(acts, dd);
+
+    $("kpi-grid").innerHTML = [
+      { l: "% complete (EV/BAC)", v: r.pctComplete.toFixed(1) + "%", c: "accent", s: "BAC " + fmtMoney(r.BAC) },
+      { l: "CPI", v: r.CPI === null ? "—" : r.CPI.toFixed(2), c: idxCls(r.CPI), s: "earned ÷ spent" },
+      { l: "SPI", v: r.SPI === null ? "—" : r.SPI.toFixed(2), c: idxCls(r.SPI), s: "earned ÷ planned" },
+      { l: "Cost variance", v: fmtMoney(r.CV), c: r.CV >= 0 ? "good" : "bad", s: "EV − AC" },
+      { l: "Schedule variance", v: fmtMoney(r.SV), c: r.SV >= 0 ? "good" : "bad", s: "EV − PV" },
+      { l: "EAC (CPI basis)", v: fmtMoney(r.EAC_cpi), c: r.VAC !== null && r.VAC < 0 ? "bad" : "good",
+        s: "typical: " + fmtMoney(r.EAC_ac) + " · worst: " + fmtMoney(r.EAC_both) },
+      { l: "VAC", v: fmtMoney(r.VAC), c: r.VAC !== null && r.VAC < 0 ? "bad" : "good", s: "BAC − EAC" },
+      { l: "TCPI", v: r.TCPI === null ? "—" : r.TCPI.toFixed(2), c: r.TCPI !== null && r.TCPI > 1.1 ? "bad" : "", s: "efficiency needed to finish on budget" }
+    ].map(k => `
+      <div class="kpi">
+        <span class="k-label">${k.l}</span>
+        <span class="k-value ${k.c}">${k.v}</span>
+        <span class="k-sub">${k.s}</span>
+      </div>`).join("");
+
+    // curves
+    const c = buildCurves(acts, dd);
+    if (chart) chart.destroy();
+    chart = new Chart($("ch-scurve"), {
+      type: "line",
+      data: {
+        labels: c.months,
+        datasets: [
+          { label: "PV (planned)", data: c.pv, borderColor: "#8d867a", borderDash: [5, 4], pointRadius: 0, tension: 0.3, backgroundColor: "transparent" },
+          { label: "EV (earned)", data: c.ev, borderColor: "#ff4d00", pointRadius: 0, tension: 0.3, backgroundColor: "rgba(255,77,0,0.07)", fill: true },
+          { label: "AC (actual cost)", data: c.ac, borderColor: "#ebe6da", pointRadius: 0, tension: 0.3, backgroundColor: "transparent" }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { labels: { boxWidth: 14, boxHeight: 2 } },
+          tooltip: { callbacks: { label: x => x.dataset.label + ": " + fmtMoney(x.parsed.y) } }
+        },
+        scales: {
+          y: { ticks: { callback: v => fmtMoney(v) }, grid: { color: "#2c2822" } },
+          x: { grid: { display: false }, ticks: { maxTicksLimit: 14 } }
+        }
+      }
+    });
+
+    // detail table
+    $("out-tbody").innerHTML = acts.map(a => {
+      const st = a.cpi === null && a.spi === null ? { c: "warn", t: "NOT STARTED" }
+        : (a.cpi !== null && a.cpi < 0.9) || (a.spi !== null && a.spi < 0.9) ? { c: "bad", t: "AT RISK" }
+        : (a.cpi !== null && a.cpi < 1) || (a.spi !== null && a.spi < 1) ? { c: "warn", t: "WATCH" }
+        : { c: "good", t: "ON TRACK" };
+      return `
+        <tr>
+          <td>${esc(a.name)}</td>
+          <td class="num">${fmtMoney(a.bac)}</td>
+          <td class="num">${fmtMoney(a.pv)}</td>
+          <td class="num">${fmtMoney(a.ev)}</td>
+          <td class="num">${fmtMoney(a.ac)}</td>
+          <td class="num ${a.cv >= 0 ? "pos" : "neg"}">${fmtMoney(a.cv)}</td>
+          <td class="num ${a.sv >= 0 ? "pos" : "neg"}">${fmtMoney(a.sv)}</td>
+          <td class="num">${a.cpi === null ? "—" : a.cpi.toFixed(2)}</td>
+          <td class="num">${a.spi === null ? "—" : a.spi.toFixed(2)}</td>
+          <td><span class="chip ${st.c}">${st.t}</span></td>
+        </tr>`;
+    }).join("");
+
+    $("results").style.display = "block";
+    $("results").scrollIntoView({ behavior: "smooth" });
+  });
+
+  $("btn-add").addEventListener("click", () => addRow());
+  $("btn-clear").addEventListener("click", () => { $("rows").innerHTML = ""; addRow(); addRow(); addRow(); });
+
+  /* ---------------- CSV import ---------------- */
+
+  $("btn-csv").addEventListener("click", () => $("file-input").click());
+  $("file-input").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    Papa.parse(file, {
+      header: true, skipEmptyLines: true,
+      complete: res => {
+        const norm = h => h.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const keys = Object.keys(res.data[0] || {});
+        const find = (...names) => keys.find(k => names.includes(norm(k)));
+        const kName = find("activity", "name", "task", "controlaccount");
+        const kBac = find("bac", "budget", "plannedcost", "budgetusd");
+        const kD1 = find("start", "startdate");
+        const kD2 = find("finish", "end", "finishdate", "enddate");
+        const kPct = find("pct", "percentcomplete", "complete", "progress", "pctcomplete");
+        const kAc = find("ac", "actual", "actualcost", "spent");
+        if (!kName) { $("err").textContent = "CSV needs an Activity/Name column."; return; }
+        $("rows").innerHTML = "";
+        res.data.forEach(r => addRow({
+          name: r[kName], bac: kBac ? r[kBac] : "",
+          d1: kD1 ? r[kD1] : "", d2: kD2 ? r[kD2] : "",
+          pct: kPct ? r[kPct] : "", ac: kAc ? r[kAc] : ""
+        }));
+        $("err").textContent = "";
+      }
+    });
+    e.target.value = "";
+  });
+
+  /* ---------------- sample ---------------- */
+
+  const SAMPLE = [
+    { name: "Mobilization",       bac: 300000,  d1: "2026-01-05", d2: "2026-02-06",  pct: 100, ac: 318000 },
+    { name: "Earthworks",         bac: 900000,  d1: "2026-01-20", d2: "2026-04-24",  pct: 100, ac: 862000 },
+    { name: "Foundations",        bac: 1400000, d1: "2026-03-02", d2: "2026-06-26",  pct: 95,  ac: 1372000 },
+    { name: "Superstructure",     bac: 2600000, d1: "2026-05-04", d2: "2026-10-30",  pct: 35,  ac: 1120000 },
+    { name: "MEP first fix",      bac: 1100000, d1: "2026-06-15", d2: "2026-11-27",  pct: 12,  ac: 190000 },
+    { name: "Envelope",           bac: 1300000, d1: "2026-07-06", d2: "2026-12-18",  pct: 0,   ac: 45000 },
+    { name: "Interior fit-out",   bac: 950000,  d1: "2026-10-05", d2: "2027-02-26",  pct: 0,   ac: 0 },
+    { name: "Commissioning",      bac: 250000,  d1: "2027-01-18", d2: "2027-03-12",  pct: 0,   ac: 0 }
+  ];
+
+  $("btn-sample").addEventListener("click", () => {
+    $("rows").innerHTML = "";
+    SAMPLE.forEach(addRow);
+    $("data-date").value = "2026-07-06";
+    $("err").textContent = "";
+    $("btn-run").click();
+  });
+
+  // init
+  addRow(); addRow(); addRow();
+  $("data-date").value = new Date().toISOString().slice(0, 10);
+  </script>
+</body>
+</html>

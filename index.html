@@ -743,7 +743,7 @@
     <div class="wrap hero-body">
       <p class="hero-kicker">Project controls &amp; data analysis — built in the field</p>
       <h1>
-        <span class="row">Baselines that</span>
+        <span class="row">Plans that</span>
         <span class="row indent"><em class="serif">hold.</em> Claims that</span>
         <span class="row"><em class="serif">land.</em> Data that</span>
         <span class="row indent"><em class="serif">decides.</em></span>
@@ -1005,6 +1005,24 @@
         link: "schedule-auditor.html"
       },
       {
+        title: "Time-Chainage Creator",
+        category: "Planning",
+        year: "2026",
+        description: "Turns an activity list — chainages, dates, durations — into a clean time-chainage (time-location) diagram. Linear works slope across the alignment, fixed works hold their chainage as vertical bands, trades are color-coded, and the result exports as SVG or PNG for reports. Built for linear projects: roads, pipelines, rail.",
+        tech: ["JavaScript", "SVG", "Linear scheduling"],
+        viz: "chainage",
+        link: "time-chainage.html"
+      },
+      {
+        title: "EV Engine — Earned Value Analysis",
+        category: "Data",
+        year: "2026",
+        description: "Enter control accounts with budget, dates, progress, and actual cost — get PV/EV/AC, CPI, SPI, cost and schedule variance, EAC forecast three ways, VAC and TCPI, plus the full S-curve chart and a per-activity performance table. The version of project truth nobody can argue with.",
+        tech: ["JavaScript", "Chart.js", "EVM"],
+        viz: "ev",
+        link: "earned-value.html"
+      },
+      {
         title: "Field Dashboard — Construction Data Visualizer",
         category: "Data",
         year: "2026",
@@ -1080,6 +1098,21 @@
         <rect x="50" y="15" width="9" height="17" fill="#453f35"/>
         <rect x="64" y="25" width="9" height="7" fill="#453f35"/>
         <text x="34" y="4.5" font-family="IBM Plex Mono, monospace" font-size="6" fill="#ff4d00">OVER</text>
+      </svg>`,
+      chainage: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="86" height="30" fill="none" stroke="#2c2822"/>
+        <line x1="6" y1="30" x2="52" y2="5" stroke="#8d867a" stroke-width="1.4"/>
+        <line x1="20" y1="32" x2="74" y2="8" stroke="#ff4d00" stroke-width="1.4"/>
+        <line x1="42" y1="32" x2="86" y2="14" stroke="#8d867a" stroke-width="1.4" stroke-dasharray="3 2"/>
+        <rect x="60" y="4" width="5" height="26" fill="#453f35"/>
+        <text x="46" y="35.5" font-family="IBM Plex Mono, monospace" font-size="6" fill="#8d867a">KM 2+400</text>
+      </svg>`,
+      ev: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 32 C 24 30 40 22 60 12 C 72 7 82 5 88 4" fill="none" stroke="#8d867a" stroke-width="1" stroke-dasharray="3 2"/>
+        <path d="M4 32 C 22 31 36 26 50 20" fill="none" stroke="#ff4d00" stroke-width="1.6"/>
+        <path d="M4 32 C 22 30 38 24 52 16" fill="none" stroke="#ebe6da" stroke-width="1"/>
+        <circle cx="50" cy="20" r="2.2" fill="#ff4d00"/>
+        <text x="58" y="26" font-family="IBM Plex Mono, monospace" font-size="7" fill="#ff4d00">CPI 0.94</text>
       </svg>`,
       macro: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
         <rect x="3" y="9" width="22" height="18" rx="3" fill="none" stroke="#8d867a"/>
