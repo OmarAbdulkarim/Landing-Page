@@ -12,17 +12,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
     :root {
-      --paper: #0f0e0c;
-      --paper-raise: #16140f;
-      --ink: #ebe6da;
-      --muted: #8d867a;
-      --accent: #ff4d00;
-      --green: #4caf7d;
-      --amber: #e0a63a;
-      --red: #e05252;
-      --blue: #5b9bd5;
-      --line: #2c2822;
-      --line-strong: #453f35;
+      --paper: #ffffff;
+      --paper-raise: #e9f4fc;
+      --ink: #14324e;
+      --muted: #5b7f9e;
+      --accent: #0284c7;
+      --green: #2e9e66;
+      --amber: #c07f10;
+      --red: #d64545;
+      --blue: #3b82c4;
+      --line: #dcebf8;
+      --line-strong: #a5c9e8;
       --mono: 'IBM Plex Mono', ui-monospace, monospace;
       --sans: 'Space Grotesk', -apple-system, sans-serif;
       --serif: 'Instrument Serif', Georgia, serif;
@@ -249,8 +249,8 @@
   const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   const DAY = 86400000;
 
-  Chart.defaults.color = "#8d867a";
-  Chart.defaults.borderColor = "#2c2822";
+  Chart.defaults.color = "#5b7f9e";
+  Chart.defaults.borderColor = "#dcebf8";
   Chart.defaults.font.family = "'IBM Plex Mono', monospace";
   Chart.defaults.font.size = 10;
 
@@ -423,9 +423,9 @@
       data: {
         labels: c.months,
         datasets: [
-          { label: "PV (planned)", data: c.pv, borderColor: "#8d867a", borderDash: [5, 4], pointRadius: 0, tension: 0.3, backgroundColor: "transparent" },
-          { label: "EV (earned)", data: c.ev, borderColor: "#ff4d00", pointRadius: 0, tension: 0.3, backgroundColor: "rgba(255,77,0,0.07)", fill: true },
-          { label: "AC (actual cost)", data: c.ac, borderColor: "#ebe6da", pointRadius: 0, tension: 0.3, backgroundColor: "transparent" }
+          { label: "PV (planned)", data: c.pv, borderColor: "#5b7f9e", borderDash: [5, 4], pointRadius: 0, tension: 0.3, backgroundColor: "transparent" },
+          { label: "EV (earned)", data: c.ev, borderColor: "#0284c7", pointRadius: 0, tension: 0.3, backgroundColor: "rgba(2,132,199,0.07)", fill: true },
+          { label: "AC (actual cost)", data: c.ac, borderColor: "#14324e", pointRadius: 0, tension: 0.3, backgroundColor: "transparent" }
         ]
       },
       options: {
@@ -436,7 +436,7 @@
           tooltip: { callbacks: { label: x => x.dataset.label + ": " + fmtMoney(x.parsed.y) } }
         },
         scales: {
-          y: { ticks: { callback: v => fmtMoney(v) }, grid: { color: "#2c2822" } },
+          y: { ticks: { callback: v => fmtMoney(v) }, grid: { color: "#dcebf8" } },
           x: { grid: { display: false }, ticks: { maxTicksLimit: 14 } }
         }
       }

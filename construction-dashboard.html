@@ -13,18 +13,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
-      --paper: #0f0e0c;
-      --paper-raise: #16140f;
-      --panel: #1a1712;
-      --ink: #ebe6da;
-      --muted: #8d867a;
-      --accent: #ff4d00;
-      --green: #4caf7d;
-      --amber: #e0a63a;
-      --red: #e05252;
-      --blue: #5b9bd5;
-      --line: #2c2822;
-      --line-strong: #453f35;
+      --paper: #ffffff;
+      --paper-raise: #e9f4fc;
+      --panel: #ddedf9;
+      --ink: #14324e;
+      --muted: #5b7f9e;
+      --accent: #0284c7;
+      --green: #2e9e66;
+      --amber: #c07f10;
+      --red: #d64545;
+      --blue: #3b82c4;
+      --line: #dcebf8;
+      --line-strong: #a5c9e8;
       --mono: 'IBM Plex Mono', ui-monospace, monospace;
       --sans: 'Space Grotesk', -apple-system, sans-serif;
       --serif: 'Instrument Serif', Georgia, serif;
@@ -656,9 +656,9 @@
   const TODAY = new Date();
 
   const COLORS = {
-    ink: "#ebe6da", muted: "#8d867a", accent: "#ff4d00",
-    green: "#4caf7d", amber: "#e0a63a", red: "#e05252",
-    blue: "#5b9bd5", line: "#2c2822", strong: "#453f35"
+    ink: "#14324e", muted: "#5b7f9e", accent: "#0284c7",
+    green: "#2e9e66", amber: "#c07f10", red: "#d64545",
+    blue: "#3b82c4", line: "#dcebf8", strong: "#a5c9e8"
   };
 
   Chart.defaults.color = COLORS.muted;
@@ -966,7 +966,7 @@
           { label: "Planned (cum.)", data: cum(plannedM), borderColor: COLORS.muted,
             backgroundColor: "transparent", borderDash: [5, 4], pointRadius: 0, tension: 0.3 },
           { label: "Actual (cum.)", data: actualCum, borderColor: COLORS.accent,
-            backgroundColor: "rgba(255,77,0,0.08)", fill: true, pointRadius: 0, tension: 0.3 }
+            backgroundColor: "rgba(2,132,199,0.08)", fill: true, pointRadius: 0, tension: 0.3 }
         ]
       },
       options: {
@@ -994,7 +994,7 @@
       type: "doughnut",
       data: {
         labels: order,
-        datasets: [{ data: counts, backgroundColor: colors, borderColor: "#0f0e0c", borderWidth: 2 }]
+        datasets: [{ data: counts, backgroundColor: colors, borderColor: "#ffffff", borderWidth: 2 }]
       },
       options: {
         responsive: true, maintainAspectRatio: false, cutout: "68%",
