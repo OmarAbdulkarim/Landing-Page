@@ -10,13 +10,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #ffffff;
-      --paper-raise: #e9f4fc;
-      --ink: #3d2c21;
-      --muted: #8a7264;
-      --accent: #0284c7;
-      --line: #dcebf8;
-      --line-strong: #a5c9e8;
+      --paper: #0e0b14;
+      --paper-raise: #161022;
+      --ink: #ece7f8;
+      --muted: #9b8ec4;
+      --accent: #38bdf8;
+      --line: #241b38;
+      --line-strong: #453567;
       --mono: 'IBM Plex Mono', ui-monospace, monospace;
       --sans: 'Space Grotesk', -apple-system, sans-serif;
       --serif: 'Instrument Serif', Georgia, serif;
@@ -126,6 +126,22 @@
       justify-content: flex-end;
       position: relative;
       border-bottom: 1px solid var(--line);
+      background: var(--paper); /* opaque so the ripple grid only shows after the hero */
+    }
+
+    /* ============ RIPPLE GRID (ported from React Bits <RippleGrid/>) ============ */
+    /* fixed full-viewport layer behind all content after the hero */
+    .ripple-grid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .ripple-grid-bg canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     /* animated shape grid (ported from React Bits <ShapeGrid/>) */
@@ -148,9 +164,9 @@
       inset: 0;
       pointer-events: none;
       background: radial-gradient(ellipse at center,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.3) 55%,
-        rgba(255,255,255,0.85) 100%);
+        rgba(14,11,20,0) 0%,
+        rgba(14,11,20,0.3) 55%,
+        rgba(14,11,20,0.85) 100%);
     }
 
     /* corner registration marks */
@@ -430,13 +446,13 @@
       --glow-padding: 68px;
       --card-bg: var(--paper);
       /* sky-blue glow, intensity 1.2 baked into the alphas */
-      --glow-color: hsl(201deg 90% 45% / 100%);
-      --glow-color-60: hsl(201deg 90% 45% / 72%);
-      --glow-color-50: hsl(201deg 90% 45% / 60%);
-      --glow-color-40: hsl(201deg 90% 45% / 48%);
-      --glow-color-30: hsl(201deg 90% 45% / 36%);
-      --glow-color-20: hsl(201deg 90% 45% / 24%);
-      --glow-color-10: hsl(201deg 90% 45% / 12%);
+      --glow-color: hsl(201deg 95% 65% / 100%);
+      --glow-color-60: hsl(201deg 95% 65% / 72%);
+      --glow-color-50: hsl(201deg 95% 65% / 60%);
+      --glow-color-40: hsl(201deg 95% 65% / 48%);
+      --glow-color-30: hsl(201deg 95% 65% / 36%);
+      --glow-color-20: hsl(201deg 95% 65% / 24%);
+      --glow-color-10: hsl(201deg 95% 65% / 12%);
 
       position: relative;
       border-radius: 8px;
@@ -447,8 +463,8 @@
       background: var(--card-bg);
       overflow: visible;
       box-shadow:
-        rgba(61, 44, 33, 0.05) 0 2px 4px,
-        rgba(61, 44, 33, 0.05) 0 8px 16px;
+        rgba(0, 0, 0, 0.05) 0 2px 4px,
+        rgba(0, 0, 0, 0.05) 0 8px 16px;
       margin-bottom: 18px;
     }
 
@@ -476,14 +492,14 @@
       background:
         linear-gradient(var(--card-bg) 0 100%) padding-box,
         linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
-        radial-gradient(at 80% 55%, #0284c7 0px, transparent 50%) border-box,
+        radial-gradient(at 80% 55%, #38bdf8 0px, transparent 50%) border-box,
         radial-gradient(at 69% 34%, #a8e8fe 0px, transparent 50%) border-box,
-        radial-gradient(at 8% 6%, #8a7264 0px, transparent 50%) border-box,
-        radial-gradient(at 41% 38%, #0284c7 0px, transparent 50%) border-box,
+        radial-gradient(at 8% 6%, #9b8ec4 0px, transparent 50%) border-box,
+        radial-gradient(at 41% 38%, #38bdf8 0px, transparent 50%) border-box,
         radial-gradient(at 86% 85%, #a8e8fe 0px, transparent 50%) border-box,
-        radial-gradient(at 82% 18%, #8a7264 0px, transparent 50%) border-box,
+        radial-gradient(at 82% 18%, #9b8ec4 0px, transparent 50%) border-box,
         radial-gradient(at 51% 4%, #a8e8fe 0px, transparent 50%) border-box,
-        linear-gradient(#0284c7 0 100%) border-box;
+        linear-gradient(#38bdf8 0 100%) border-box;
       opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
       mask-image: conic-gradient(
         from var(--cursor-angle) at center,
@@ -498,14 +514,14 @@
     .border-glow-card::after {
       border: 1px solid transparent;
       background:
-        radial-gradient(at 80% 55%, #0284c7 0px, transparent 50%) padding-box,
+        radial-gradient(at 80% 55%, #38bdf8 0px, transparent 50%) padding-box,
         radial-gradient(at 69% 34%, #a8e8fe 0px, transparent 50%) padding-box,
-        radial-gradient(at 8% 6%, #8a7264 0px, transparent 50%) padding-box,
-        radial-gradient(at 41% 38%, #0284c7 0px, transparent 50%) padding-box,
+        radial-gradient(at 8% 6%, #9b8ec4 0px, transparent 50%) padding-box,
+        radial-gradient(at 41% 38%, #38bdf8 0px, transparent 50%) padding-box,
         radial-gradient(at 86% 85%, #a8e8fe 0px, transparent 50%) padding-box,
-        radial-gradient(at 82% 18%, #8a7264 0px, transparent 50%) padding-box,
+        radial-gradient(at 82% 18%, #9b8ec4 0px, transparent 50%) padding-box,
         radial-gradient(at 51% 4%, #a8e8fe 0px, transparent 50%) padding-box,
-        linear-gradient(#0284c7 0 100%) padding-box;
+        linear-gradient(#38bdf8 0 100%) padding-box;
       mask-image:
         linear-gradient(to bottom, black, black),
         radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
@@ -613,7 +629,7 @@
       background: var(--paper);
       border: 1px solid var(--line-strong);
       border-radius: 8px;
-      box-shadow: 0 24px 60px rgba(61, 44, 33, 0.12);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
       transform-origin: top center;
       will-change: transform;
       backface-visibility: hidden;
@@ -869,7 +885,7 @@
       --icon: none;
       --behind-glow-color: rgba(125, 190, 255, 0.67);
       --behind-glow-size: 50%;
-      --inner-gradient: linear-gradient(145deg, #0284c78c 0%, #71C4FF44 100%);
+      --inner-gradient: linear-gradient(145deg, #38bdf88c 0%, #71C4FF44 100%);
       --sunpillar-1: hsl(2, 100%, 73%);
       --sunpillar-2: hsl(53, 100%, 69%);
       --sunpillar-3: hsl(93, 100%, 69%);
@@ -1463,6 +1479,8 @@
     </div>
   </header>
 
+  <div class="ripple-grid-bg" aria-hidden="true"></div>
+
   <div class="ticker" aria-hidden="true">
     <div class="ticker-track" id="ticker-track">
       <span>Primavera P6 <b>✦</b></span><span>CPM <b>✦</b></span><span>Baselines <b>✦</b></span><span>EOT Claims <b>✦</b></span><span>Time-Impact Analysis <b>✦</b></span><span>Earned Value <b>✦</b></span><span>Power Query <b>✦</b></span><span>VBA <b>✦</b></span><span>Power BI <b>✦</b></span><span>Dashboards <b>✦</b></span><span>Data Analysis <b>✦</b></span><span>Planning <b>✦</b></span><span>Big Data <b>✦</b></span><span>AI Integration <b>✦</b></span>
@@ -1484,16 +1502,16 @@
         <span class="disc-name">Schedule Analysis</span>
         <span class="disc-desc">Baselines, critical paths, and program health checks across a live portfolio — finding the slippage before it finds the completion date.</span>
         <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="17" width="13" height="9" fill="none" stroke="#8a7264"/>
-          <rect x="38" y="4" width="13" height="9" fill="none" stroke="#8a7264"/>
-          <rect x="38" y="30" width="13" height="9" fill="none" stroke="#0284c7"/>
-          <rect x="74" y="17" width="13" height="9" fill="none" stroke="#0284c7"/>
-          <path d="M15 19 L38 9" stroke="#8a7264" fill="none"/>
-          <path d="M51 9 L74 20" stroke="#8a7264" fill="none"/>
-          <path d="M15 24 L38 34" stroke="#0284c7" fill="none"/>
-          <path d="M51 34 L74 24" stroke="#0284c7" fill="none"/>
-          <text x="90" y="11" font-family="IBM Plex Mono, monospace" font-size="7" fill="#8a7264">TF+9</text>
-          <text x="90" y="39" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0284c7">TF 0</text>
+          <rect x="2" y="17" width="13" height="9" fill="none" stroke="#9b8ec4"/>
+          <rect x="38" y="4" width="13" height="9" fill="none" stroke="#9b8ec4"/>
+          <rect x="38" y="30" width="13" height="9" fill="none" stroke="#38bdf8"/>
+          <rect x="74" y="17" width="13" height="9" fill="none" stroke="#38bdf8"/>
+          <path d="M15 19 L38 9" stroke="#9b8ec4" fill="none"/>
+          <path d="M51 9 L74 20" stroke="#9b8ec4" fill="none"/>
+          <path d="M15 24 L38 34" stroke="#38bdf8" fill="none"/>
+          <path d="M51 34 L74 24" stroke="#38bdf8" fill="none"/>
+          <text x="90" y="11" font-family="IBM Plex Mono, monospace" font-size="7" fill="#9b8ec4">TF+9</text>
+          <text x="90" y="39" font-family="IBM Plex Mono, monospace" font-size="7" fill="#38bdf8">TF 0</text>
         </svg></span>
         <span class="disc-arrow">→</span>
       </div>
@@ -1504,16 +1522,16 @@
         <span class="disc-name">Delay &amp; Claims</span>
         <span class="disc-desc">Extension of Time claims built on Time-Impact, Window, and Impacted-as-Planned analysis — evidence first, argument second.</span>
         <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
-          <text x="2" y="10" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#8a7264">BL</text>
-          <rect x="14" y="4" width="46" height="7" fill="#a5c9e8"/>
-          <text x="2" y="24" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#8a7264">ACT</text>
-          <rect x="14" y="18" width="46" height="7" fill="#a5c9e8" opacity="0.5"/>
-          <rect x="60" y="18" width="32" height="7" fill="none" stroke="#0284c7"/>
-          <line x1="60" y1="27" x2="60" y2="36" stroke="#8a7264" stroke-width="0.8"/>
-          <line x1="92" y1="27" x2="92" y2="36" stroke="#8a7264" stroke-width="0.8"/>
-          <line x1="60" y1="33" x2="92" y2="33" stroke="#0284c7" stroke-width="0.8"/>
-          <path d="M60 33 l4 -2 v4 z M92 33 l-4 -2 v4 z" fill="#0284c7"/>
-          <text x="64" y="43" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0284c7">Δ 46d</text>
+          <text x="2" y="10" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#9b8ec4">BL</text>
+          <rect x="14" y="4" width="46" height="7" fill="#453567"/>
+          <text x="2" y="24" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#9b8ec4">ACT</text>
+          <rect x="14" y="18" width="46" height="7" fill="#453567" opacity="0.5"/>
+          <rect x="60" y="18" width="32" height="7" fill="none" stroke="#38bdf8"/>
+          <line x1="60" y1="27" x2="60" y2="36" stroke="#9b8ec4" stroke-width="0.8"/>
+          <line x1="92" y1="27" x2="92" y2="36" stroke="#9b8ec4" stroke-width="0.8"/>
+          <line x1="60" y1="33" x2="92" y2="33" stroke="#38bdf8" stroke-width="0.8"/>
+          <path d="M60 33 l4 -2 v4 z M92 33 l-4 -2 v4 z" fill="#38bdf8"/>
+          <text x="64" y="43" font-family="IBM Plex Mono, monospace" font-size="7" fill="#38bdf8">Δ 46d</text>
         </svg></span>
         <span class="disc-arrow">→</span>
       </div>
@@ -1524,14 +1542,14 @@
         <span class="disc-name">Reporting &amp; Dashboards</span>
         <span class="disc-desc">Weekly and monthly management dashboards that turn raw program updates into progress, risk, and KPI visibility.</span>
         <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 4 V38 H106" stroke="#8a7264" fill="none" stroke-width="0.8"/>
-          <line x1="6" y1="12" x2="8" y2="12" stroke="#8a7264" stroke-width="0.8"/>
-          <line x1="6" y1="22" x2="8" y2="22" stroke="#8a7264" stroke-width="0.8"/>
-          <line x1="6" y1="32" x2="8" y2="32" stroke="#8a7264" stroke-width="0.8"/>
-          <path d="M8 35 L28 31 L46 25 L64 17 L82 11 L104 8" fill="none" stroke="#8a7264" stroke-width="1" stroke-dasharray="3 2"/>
-          <path d="M8 36 L28 34 L46 30 L64 25 L82 21" fill="none" stroke="#0284c7" stroke-width="1.6"/>
-          <circle cx="82" cy="21" r="2.2" fill="#0284c7"/>
-          <text x="60" y="42" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0284c7">SPI 0.87</text>
+          <path d="M8 4 V38 H106" stroke="#9b8ec4" fill="none" stroke-width="0.8"/>
+          <line x1="6" y1="12" x2="8" y2="12" stroke="#9b8ec4" stroke-width="0.8"/>
+          <line x1="6" y1="22" x2="8" y2="22" stroke="#9b8ec4" stroke-width="0.8"/>
+          <line x1="6" y1="32" x2="8" y2="32" stroke="#9b8ec4" stroke-width="0.8"/>
+          <path d="M8 35 L28 31 L46 25 L64 17 L82 11 L104 8" fill="none" stroke="#9b8ec4" stroke-width="1" stroke-dasharray="3 2"/>
+          <path d="M8 36 L28 34 L46 30 L64 25 L82 21" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
+          <circle cx="82" cy="21" r="2.2" fill="#38bdf8"/>
+          <text x="60" y="42" font-family="IBM Plex Mono, monospace" font-size="7" fill="#38bdf8">SPI 0.87</text>
         </svg></span>
         <span class="disc-arrow">→</span>
       </div>
@@ -1542,13 +1560,13 @@
         <span class="disc-name">Tooling &amp; Automation</span>
         <span class="disc-desc">Power Query, VBA, and macro tools that replace manual controls work — built once, then adopted by the whole team.</span>
         <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
-          <text x="3" y="12" font-family="IBM Plex Mono, monospace" font-size="7" fill="#a5c9e8">1</text>
-          <text x="3" y="24" font-family="IBM Plex Mono, monospace" font-size="7" fill="#a5c9e8">2</text>
-          <text x="3" y="36" font-family="IBM Plex Mono, monospace" font-size="7" fill="#a5c9e8">3</text>
-          <text x="12" y="12" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#8a7264">Sub CheckXER()</text>
-          <text x="12" y="24" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#8a7264">For Each act</text>
-          <text x="12" y="36" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#0284c7">.RunAudit</text>
-          <rect class="cur-blink" x="58" y="29" width="5" height="9" fill="#0284c7"/>
+          <text x="3" y="12" font-family="IBM Plex Mono, monospace" font-size="7" fill="#453567">1</text>
+          <text x="3" y="24" font-family="IBM Plex Mono, monospace" font-size="7" fill="#453567">2</text>
+          <text x="3" y="36" font-family="IBM Plex Mono, monospace" font-size="7" fill="#453567">3</text>
+          <text x="12" y="12" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#9b8ec4">Sub CheckXER()</text>
+          <text x="12" y="24" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#9b8ec4">For Each act</text>
+          <text x="12" y="36" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#38bdf8">.RunAudit</text>
+          <rect class="cur-blink" x="58" y="29" width="5" height="9" fill="#38bdf8"/>
         </svg></span>
         <span class="disc-arrow">→</span>
       </div>
@@ -1646,7 +1664,7 @@
       <div class="viz-frame">
         <svg viewBox="0 0 1200 440" xmlns="http://www.w3.org/2000/svg" role="img">
           <!-- background grid -->
-          <g stroke="#dcebf8" stroke-width="1" opacity="0.45">
+          <g stroke="#241b38" stroke-width="1" opacity="0.45">
             <line x1="130"  y1="46" x2="130"  y2="400"/>
             <line x1="240"  y1="46" x2="240"  y2="400"/>
             <line x1="350"  y1="46" x2="350"  y2="400"/>
@@ -1665,38 +1683,38 @@
 
           <!-- legend -->
           <g font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="1">
-            <rect x="60" y="24" width="10" height="10" fill="#a5c9e8"/>
-            <text x="76" y="33" fill="#8a7264">PLANNED / PERIOD</text>
-            <rect x="220" y="24" width="10" height="10" fill="#0284c7"/>
-            <text x="236" y="33" fill="#8a7264">ACTUAL / PERIOD</text>
-            <line x1="380" y1="29" x2="404" y2="29" stroke="#8a7264" stroke-dasharray="5 4" stroke-width="1.5"/>
-            <text x="410" y="33" fill="#8a7264">CUM. PLANNED</text>
-            <line x1="540" y1="29" x2="564" y2="29" stroke="#0284c7" stroke-width="2"/>
-            <text x="570" y="33" fill="#8a7264">CUM. ACTUAL</text>
+            <rect x="60" y="24" width="10" height="10" fill="#453567"/>
+            <text x="76" y="33" fill="#9b8ec4">PLANNED / PERIOD</text>
+            <rect x="220" y="24" width="10" height="10" fill="#38bdf8"/>
+            <text x="236" y="33" fill="#9b8ec4">ACTUAL / PERIOD</text>
+            <line x1="380" y1="29" x2="404" y2="29" stroke="#9b8ec4" stroke-dasharray="5 4" stroke-width="1.5"/>
+            <text x="410" y="33" fill="#9b8ec4">CUM. PLANNED</text>
+            <line x1="540" y1="29" x2="564" y2="29" stroke="#38bdf8" stroke-width="2"/>
+            <text x="570" y="33" fill="#9b8ec4">CUM. ACTUAL</text>
           </g>
 
           <!-- planned/actual column pairs (actuals stop at data date) -->
           <g>
-            <rect class="gcol" style="animation-delay:0s"    x="102" y="340" width="24" height="60"  fill="#a5c9e8"/>
-            <rect class="gcol" style="animation-delay:0.2s"  x="130" y="350" width="24" height="50"  fill="#0284c7"/>
-            <rect class="gcol" style="animation-delay:0.5s"  x="212" y="290" width="24" height="110" fill="#a5c9e8"/>
-            <rect class="gcol" style="animation-delay:0.7s"  x="240" y="305" width="24" height="95"  fill="#0284c7"/>
-            <rect class="gcol" style="animation-delay:1s"    x="322" y="230" width="24" height="170" fill="#a5c9e8"/>
-            <rect class="gcol" style="animation-delay:1.2s"  x="350" y="250" width="24" height="150" fill="#0284c7"/>
-            <rect class="gcol" style="animation-delay:1.5s"  x="432" y="170" width="24" height="230" fill="#a5c9e8"/>
-            <rect class="gcol" style="animation-delay:1.7s"  x="460" y="200" width="24" height="200" fill="#0284c7"/>
-            <rect class="gcol" style="animation-delay:2s"    x="542" y="140" width="24" height="260" fill="#a5c9e8"/>
-            <rect class="gcol" style="animation-delay:2.2s"  x="570" y="185" width="24" height="215" fill="#0284c7"/>
-            <rect class="gcol" style="animation-delay:2.5s"  x="652" y="160" width="24" height="240" fill="#a5c9e8"/>
-            <rect class="gcol" style="animation-delay:2.7s"  x="680" y="210" width="24" height="190" fill="#0284c7"/>
-            <rect class="gcol" style="animation-delay:3s"    x="762" y="200" width="24" height="200" fill="#a5c9e8" opacity="0.55"/>
-            <rect class="gcol" style="animation-delay:3.3s"  x="872" y="250" width="24" height="150" fill="#a5c9e8" opacity="0.55"/>
-            <rect class="gcol" style="animation-delay:3.6s"  x="982" y="300" width="24" height="100" fill="#a5c9e8" opacity="0.55"/>
-            <rect class="gcol" style="animation-delay:3.9s"  x="1092" y="340" width="24" height="60" fill="#a5c9e8" opacity="0.55"/>
+            <rect class="gcol" style="animation-delay:0s"    x="102" y="340" width="24" height="60"  fill="#453567"/>
+            <rect class="gcol" style="animation-delay:0.2s"  x="130" y="350" width="24" height="50"  fill="#38bdf8"/>
+            <rect class="gcol" style="animation-delay:0.5s"  x="212" y="290" width="24" height="110" fill="#453567"/>
+            <rect class="gcol" style="animation-delay:0.7s"  x="240" y="305" width="24" height="95"  fill="#38bdf8"/>
+            <rect class="gcol" style="animation-delay:1s"    x="322" y="230" width="24" height="170" fill="#453567"/>
+            <rect class="gcol" style="animation-delay:1.2s"  x="350" y="250" width="24" height="150" fill="#38bdf8"/>
+            <rect class="gcol" style="animation-delay:1.5s"  x="432" y="170" width="24" height="230" fill="#453567"/>
+            <rect class="gcol" style="animation-delay:1.7s"  x="460" y="200" width="24" height="200" fill="#38bdf8"/>
+            <rect class="gcol" style="animation-delay:2s"    x="542" y="140" width="24" height="260" fill="#453567"/>
+            <rect class="gcol" style="animation-delay:2.2s"  x="570" y="185" width="24" height="215" fill="#38bdf8"/>
+            <rect class="gcol" style="animation-delay:2.5s"  x="652" y="160" width="24" height="240" fill="#453567"/>
+            <rect class="gcol" style="animation-delay:2.7s"  x="680" y="210" width="24" height="190" fill="#38bdf8"/>
+            <rect class="gcol" style="animation-delay:3s"    x="762" y="200" width="24" height="200" fill="#453567" opacity="0.55"/>
+            <rect class="gcol" style="animation-delay:3.3s"  x="872" y="250" width="24" height="150" fill="#453567" opacity="0.55"/>
+            <rect class="gcol" style="animation-delay:3.6s"  x="982" y="300" width="24" height="100" fill="#453567" opacity="0.55"/>
+            <rect class="gcol" style="animation-delay:3.9s"  x="1092" y="340" width="24" height="60" fill="#453567" opacity="0.55"/>
           </g>
 
           <!-- month labels -->
-          <g font-family="IBM Plex Mono, monospace" font-size="9" fill="#8a7264" text-anchor="middle">
+          <g font-family="IBM Plex Mono, monospace" font-size="9" fill="#9b8ec4" text-anchor="middle">
             <text x="128" y="416">M1</text>
             <text x="238" y="416">M2</text>
             <text x="348" y="416">M3</text>
@@ -1711,16 +1729,16 @@
 
           <!-- cumulative planned curve (static, dashed) -->
           <path d="M 104 394 C 300 380 460 320 640 240 C 800 172 1000 116 1150 92"
-                fill="none" stroke="#8a7264" stroke-width="1.5"
+                fill="none" stroke="#9b8ec4" stroke-width="1.5"
                 stroke-dasharray="5 5" opacity="0.5"/>
 
           <!-- cumulative actual curve (draws itself, stops at data date) -->
           <path class="scurve" pathLength="100"
                 d="M 104 396 C 260 388 400 348 540 300 C 620 272 680 254 716 246"
-                fill="none" stroke="#0284c7" stroke-width="2.5"/>
+                fill="none" stroke="#38bdf8" stroke-width="2.5"/>
 
           <!-- progress dot riding the actual curve -->
-          <circle r="5" fill="#0284c7">
+          <circle r="5" fill="#38bdf8">
             <animateMotion dur="12s" repeatCount="indefinite"
               keyPoints="0;0;1;1" keyTimes="0;0.12;0.7;1" calcMode="linear"
               path="M 104 396 C 260 388 400 348 540 300 C 620 272 680 254 716 246"/>
@@ -1728,16 +1746,16 @@
 
           <!-- variance annotation at data date -->
           <g font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="1">
-            <line x1="716" y1="246" x2="716" y2="204" stroke="#0284c7" stroke-width="1" stroke-dasharray="2 3"/>
-            <text x="726" y="222" fill="#0284c7">SV −8%</text>
-            <text x="1156" y="90" fill="#8a7264" text-anchor="end">BAC</text>
+            <line x1="716" y1="246" x2="716" y2="204" stroke="#38bdf8" stroke-width="1" stroke-dasharray="2 3"/>
+            <text x="726" y="222" fill="#38bdf8">SV −8%</text>
+            <text x="1156" y="90" fill="#9b8ec4" text-anchor="end">BAC</text>
           </g>
 
           <!-- data date (static, pulsing) -->
           <g class="ddstat">
-            <line x1="734" y1="46" x2="734" y2="404" stroke="#3d2c21" stroke-width="1" stroke-dasharray="3 4"/>
+            <line x1="734" y1="46" x2="734" y2="404" stroke="#ece7f8" stroke-width="1" stroke-dasharray="3 4"/>
             <text x="734" y="432" font-family="IBM Plex Mono, monospace" font-size="9"
-                  fill="#3d2c21" text-anchor="middle" letter-spacing="1">DATA DATE</text>
+                  fill="#ece7f8" text-anchor="middle" letter-spacing="1">DATA DATE</text>
           </g>
         </svg>
       </div>
@@ -1871,65 +1889,65 @@
     // mini-graphs matched to each tool — drawn as fragments of real controls output
     const VIZ = {
       audit: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
-        <text x="2" y="24" font-family="IBM Plex Mono, monospace" font-size="15" fill="#0284c7">9/14</text>
-        <rect x="48" y="3" width="8" height="8" fill="none" stroke="#8a7264"/>
-        <text x="59" y="10" font-family="IBM Plex Mono, monospace" font-size="7" fill="#8a7264">LOGIC ✓</text>
-        <rect x="48" y="14" width="8" height="8" fill="none" stroke="#8a7264"/>
-        <text x="59" y="21" font-family="IBM Plex Mono, monospace" font-size="7" fill="#8a7264">LEADS ✓</text>
-        <rect x="48" y="25" width="8" height="8" fill="none" stroke="#0284c7"/>
-        <text x="59" y="32" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0284c7">FLOAT ✕</text>
+        <text x="2" y="24" font-family="IBM Plex Mono, monospace" font-size="15" fill="#38bdf8">9/14</text>
+        <rect x="48" y="3" width="8" height="8" fill="none" stroke="#9b8ec4"/>
+        <text x="59" y="10" font-family="IBM Plex Mono, monospace" font-size="7" fill="#9b8ec4">LOGIC ✓</text>
+        <rect x="48" y="14" width="8" height="8" fill="none" stroke="#9b8ec4"/>
+        <text x="59" y="21" font-family="IBM Plex Mono, monospace" font-size="7" fill="#9b8ec4">LEADS ✓</text>
+        <rect x="48" y="25" width="8" height="8" fill="none" stroke="#38bdf8"/>
+        <text x="59" y="32" font-family="IBM Plex Mono, monospace" font-size="7" fill="#38bdf8">FLOAT ✕</text>
       </svg>`,
       dash: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 30 A 22 22 0 0 1 52 30" fill="none" stroke="#a5c9e8" stroke-width="4"/>
-        <path d="M8 30 A 22 22 0 0 1 22 12" fill="none" stroke="#0284c7" stroke-width="4"/>
-        <line x1="30" y1="30" x2="21" y2="15" stroke="#3d2c21" stroke-width="1.2"/>
-        <circle cx="30" cy="30" r="2" fill="#3d2c21"/>
-        <text x="60" y="18" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0284c7">42%</text>
-        <text x="60" y="28" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#8a7264">EARNED</text>
+        <path d="M8 30 A 22 22 0 0 1 52 30" fill="none" stroke="#453567" stroke-width="4"/>
+        <path d="M8 30 A 22 22 0 0 1 22 12" fill="none" stroke="#38bdf8" stroke-width="4"/>
+        <line x1="30" y1="30" x2="21" y2="15" stroke="#ece7f8" stroke-width="1.2"/>
+        <circle cx="30" cy="30" r="2" fill="#ece7f8"/>
+        <text x="60" y="18" font-family="IBM Plex Mono, monospace" font-size="10" fill="#38bdf8">42%</text>
+        <text x="60" y="28" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#9b8ec4">EARNED</text>
       </svg>`,
       check: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
-        <line x1="2" y1="13" x2="88" y2="13" stroke="#dcebf8"/>
-        <line x1="2" y1="24" x2="88" y2="24" stroke="#dcebf8"/>
-        <text x="3" y="10" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#8a7264">A1020&#160;&#160;FS&#160;&#160;OK</text>
-        <text x="3" y="21" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#0284c7">A1045&#160;&#160;!&#160;OPEN END</text>
-        <text x="3" y="32" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#8a7264">A1100&#160;&#160;FS&#160;&#160;OK</text>
-        <rect x="1" y="15" width="88" height="10" fill="#0284c7" opacity="0.09"/>
+        <line x1="2" y1="13" x2="88" y2="13" stroke="#241b38"/>
+        <line x1="2" y1="24" x2="88" y2="24" stroke="#241b38"/>
+        <text x="3" y="10" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#9b8ec4">A1020&#160;&#160;FS&#160;&#160;OK</text>
+        <text x="3" y="21" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#38bdf8">A1045&#160;&#160;!&#160;OPEN END</text>
+        <text x="3" y="32" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#9b8ec4">A1100&#160;&#160;FS&#160;&#160;OK</text>
+        <rect x="1" y="15" width="88" height="10" fill="#38bdf8" opacity="0.09"/>
       </svg>`,
       load: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
-        <line x1="2" y1="32" x2="88" y2="32" stroke="#dcebf8"/>
-        <line x1="2" y1="11" x2="72" y2="11" stroke="#8a7264" stroke-width="0.8" stroke-dasharray="3 2"/>
-        <text x="74" y="13" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#8a7264">CAP</text>
-        <rect x="8" y="22" width="9" height="10" fill="#a5c9e8"/>
-        <rect x="22" y="17" width="9" height="15" fill="#a5c9e8"/>
-        <rect x="36" y="6" width="9" height="26" fill="#0284c7"/>
-        <rect x="50" y="15" width="9" height="17" fill="#a5c9e8"/>
-        <rect x="64" y="25" width="9" height="7" fill="#a5c9e8"/>
-        <text x="34" y="4.5" font-family="IBM Plex Mono, monospace" font-size="6" fill="#0284c7">OVER</text>
+        <line x1="2" y1="32" x2="88" y2="32" stroke="#241b38"/>
+        <line x1="2" y1="11" x2="72" y2="11" stroke="#9b8ec4" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <text x="74" y="13" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#9b8ec4">CAP</text>
+        <rect x="8" y="22" width="9" height="10" fill="#453567"/>
+        <rect x="22" y="17" width="9" height="15" fill="#453567"/>
+        <rect x="36" y="6" width="9" height="26" fill="#38bdf8"/>
+        <rect x="50" y="15" width="9" height="17" fill="#453567"/>
+        <rect x="64" y="25" width="9" height="7" fill="#453567"/>
+        <text x="34" y="4.5" font-family="IBM Plex Mono, monospace" font-size="6" fill="#38bdf8">OVER</text>
       </svg>`,
       chainage: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="2" width="86" height="30" fill="none" stroke="#dcebf8"/>
-        <line x1="6" y1="30" x2="52" y2="5" stroke="#8a7264" stroke-width="1.4"/>
-        <line x1="20" y1="32" x2="74" y2="8" stroke="#0284c7" stroke-width="1.4"/>
-        <line x1="42" y1="32" x2="86" y2="14" stroke="#8a7264" stroke-width="1.4" stroke-dasharray="3 2"/>
-        <rect x="60" y="4" width="5" height="26" fill="#a5c9e8"/>
-        <text x="46" y="35.5" font-family="IBM Plex Mono, monospace" font-size="6" fill="#8a7264">KM 2+400</text>
+        <rect x="2" y="2" width="86" height="30" fill="none" stroke="#241b38"/>
+        <line x1="6" y1="30" x2="52" y2="5" stroke="#9b8ec4" stroke-width="1.4"/>
+        <line x1="20" y1="32" x2="74" y2="8" stroke="#38bdf8" stroke-width="1.4"/>
+        <line x1="42" y1="32" x2="86" y2="14" stroke="#9b8ec4" stroke-width="1.4" stroke-dasharray="3 2"/>
+        <rect x="60" y="4" width="5" height="26" fill="#453567"/>
+        <text x="46" y="35.5" font-family="IBM Plex Mono, monospace" font-size="6" fill="#9b8ec4">KM 2+400</text>
       </svg>`,
       ev: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
-        <path d="M4 32 C 24 30 40 22 60 12 C 72 7 82 5 88 4" fill="none" stroke="#8a7264" stroke-width="1" stroke-dasharray="3 2"/>
-        <path d="M4 32 C 22 31 36 26 50 20" fill="none" stroke="#0284c7" stroke-width="1.6"/>
-        <path d="M4 32 C 22 30 38 24 52 16" fill="none" stroke="#3d2c21" stroke-width="1"/>
-        <circle cx="50" cy="20" r="2.2" fill="#0284c7"/>
-        <text x="58" y="26" font-family="IBM Plex Mono, monospace" font-size="7" fill="#0284c7">CPI 0.94</text>
+        <path d="M4 32 C 24 30 40 22 60 12 C 72 7 82 5 88 4" fill="none" stroke="#9b8ec4" stroke-width="1" stroke-dasharray="3 2"/>
+        <path d="M4 32 C 22 31 36 26 50 20" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
+        <path d="M4 32 C 22 30 38 24 52 16" fill="none" stroke="#ece7f8" stroke-width="1"/>
+        <circle cx="50" cy="20" r="2.2" fill="#38bdf8"/>
+        <text x="58" y="26" font-family="IBM Plex Mono, monospace" font-size="7" fill="#38bdf8">CPI 0.94</text>
       </svg>`,
       macro: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
-        <rect x="3" y="9" width="22" height="18" rx="3" fill="none" stroke="#8a7264"/>
-        <text x="8" y="22" font-family="IBM Plex Mono, monospace" font-size="9" fill="#3d2c21">F5</text>
-        <path d="M 30 18 h 13 m 0 0 l -4 -4 m 4 4 l -4 4" stroke="#0284c7" stroke-width="1.4" fill="none"/>
-        <rect x="50" y="17" width="7" height="11" fill="#a5c9e8"/>
-        <rect x="60" y="10" width="7" height="18" fill="#0284c7"/>
-        <rect x="70" y="20" width="7" height="8" fill="#a5c9e8"/>
-        <line x1="48" y1="28" x2="82" y2="28" stroke="#dcebf8"/>
-        <text x="48" y="8" font-family="IBM Plex Mono, monospace" font-size="6" fill="#8a7264">XER→DASH</text>
+        <rect x="3" y="9" width="22" height="18" rx="3" fill="none" stroke="#9b8ec4"/>
+        <text x="8" y="22" font-family="IBM Plex Mono, monospace" font-size="9" fill="#ece7f8">F5</text>
+        <path d="M 30 18 h 13 m 0 0 l -4 -4 m 4 4 l -4 4" stroke="#38bdf8" stroke-width="1.4" fill="none"/>
+        <rect x="50" y="17" width="7" height="11" fill="#453567"/>
+        <rect x="60" y="10" width="7" height="18" fill="#38bdf8"/>
+        <rect x="70" y="20" width="7" height="8" fill="#453567"/>
+        <line x1="48" y1="28" x2="82" y2="28" stroke="#241b38"/>
+        <text x="48" y="8" font-family="IBM Plex Mono, monospace" font-size="6" fill="#9b8ec4">XER→DASH</text>
       </svg>`
     };
 
@@ -2088,7 +2106,7 @@
       const direction = "diagonal";       // up, down, left, right, diagonal
       const speed = 0.47;
       const squareSize = 40;
-      const borderColor = "#cfe4f6";
+      const borderColor = "#2c2145";
       const hoverFillColor = "#a8e8fe";
       const hoverTrailAmount = 6;         // trailing hovered squares (0 = no trail)
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2395,6 +2413,240 @@
         });
       }, { threshold: 0.3 });
       pcObserver.observe(wrap);
+    })();
+
+    // ============================================================
+    // RIPPLE GRID — vanilla WebGL port of React Bits <RippleGrid/>
+    // (raw WebGL fullscreen triangle instead of the ogl dependency)
+    // ============================================================
+    (function () {
+      const container = document.querySelector(".ripple-grid-bg");
+      if (!container) return;
+
+      const opts = {
+        enableRainbow: false,
+        gridColor: "#8b5cf6",        // theme purple
+        rippleIntensity: 0.05,
+        gridSize: 12,
+        gridThickness: 28,
+        fadeDistance: 1.6,
+        vignetteStrength: 2.8,
+        glowIntensity: 0.15,
+        opacity: 0.5,
+        gridRotation: 0,
+        mouseInteraction: true,
+        mouseInteractionRadius: 1.9
+      };
+
+      const canvas = document.createElement("canvas");
+      container.appendChild(canvas);
+      const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false });
+      if (!gl) { container.remove(); return; }
+
+      const vert = "attribute vec2 position; varying vec2 vUv;" +
+        "void main() { vUv = position * 0.5 + 0.5; gl_Position = vec4(position, 0.0, 1.0); }";
+
+      const frag = `precision highp float;
+uniform float iTime;
+uniform vec2 iResolution;
+uniform bool enableRainbow;
+uniform vec3 gridColor;
+uniform float rippleIntensity;
+uniform float gridSize;
+uniform float gridThickness;
+uniform float fadeDistance;
+uniform float vignetteStrength;
+uniform float glowIntensity;
+uniform float opacity;
+uniform float gridRotation;
+uniform bool mouseInteraction;
+uniform vec2 mousePosition;
+uniform float mouseInfluence;
+uniform float mouseInteractionRadius;
+varying vec2 vUv;
+
+float pi = 3.141592;
+
+mat2 rotate(float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return mat2(c, -s, s, c);
+}
+
+void main() {
+    vec2 uv = vUv * 2.0 - 1.0;
+    uv.x *= iResolution.x / iResolution.y;
+
+    if (gridRotation != 0.0) {
+        uv = rotate(gridRotation * pi / 180.0) * uv;
+    }
+
+    float dist = length(uv);
+    float func = sin(pi * (iTime - dist));
+    vec2 rippleUv = uv + uv * func * rippleIntensity;
+
+    if (mouseInteraction && mouseInfluence > 0.0) {
+        vec2 mouseUv = (mousePosition * 2.0 - 1.0);
+        mouseUv.x *= iResolution.x / iResolution.y;
+        float mouseDist = length(uv - mouseUv);
+
+        float influence = mouseInfluence * exp(-mouseDist * mouseDist / (mouseInteractionRadius * mouseInteractionRadius));
+
+        float mouseWave = sin(pi * (iTime * 2.0 - mouseDist * 3.0)) * influence;
+        rippleUv += normalize(uv - mouseUv) * mouseWave * rippleIntensity * 0.3;
+    }
+
+    vec2 a = sin(gridSize * 0.5 * pi * rippleUv - pi / 2.0);
+    vec2 b = abs(a);
+
+    float aaWidth = 0.5;
+    vec2 smoothB = vec2(
+        smoothstep(0.0, aaWidth, b.x),
+        smoothstep(0.0, aaWidth, b.y)
+    );
+
+    vec3 color = vec3(0.0);
+    color += exp(-gridThickness * smoothB.x * (0.8 + 0.5 * sin(pi * iTime)));
+    color += exp(-gridThickness * smoothB.y);
+    color += 0.5 * exp(-(gridThickness / 4.0) * sin(smoothB.x));
+    color += 0.5 * exp(-(gridThickness / 3.0) * smoothB.y);
+
+    if (glowIntensity > 0.0) {
+        color += glowIntensity * exp(-gridThickness * 0.5 * smoothB.x);
+        color += glowIntensity * exp(-gridThickness * 0.5 * smoothB.y);
+    }
+
+    float ddd = exp(-2.0 * clamp(pow(dist, fadeDistance), 0.0, 1.0));
+
+    vec2 vignetteCoords = vUv - 0.5;
+    float vignetteDistance = length(vignetteCoords);
+    float vignette = 1.0 - pow(vignetteDistance * 2.0, vignetteStrength);
+    vignette = clamp(vignette, 0.0, 1.0);
+
+    vec3 t;
+    if (enableRainbow) {
+        t = vec3(
+            uv.x * 0.5 + 0.5 * sin(iTime),
+            uv.y * 0.5 + 0.5 * cos(iTime),
+            pow(cos(iTime), 4.0)
+        ) + 0.5;
+    } else {
+        t = gridColor;
+    }
+
+    float finalFade = ddd * vignette;
+    float alpha = length(color) * finalFade * opacity;
+    gl_FragColor = vec4(color * t * finalFade * opacity, alpha);
+}`;
+
+      function compile(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          console.error("RippleGrid shader error:", gl.getShaderInfoLog(s));
+          return null;
+        }
+        return s;
+      }
+
+      const vs = compile(gl.VERTEX_SHADER, vert);
+      const fs = compile(gl.FRAGMENT_SHADER, frag);
+      if (!vs || !fs) { container.remove(); return; }
+
+      const prog = gl.createProgram();
+      gl.attachShader(prog, vs);
+      gl.attachShader(prog, fs);
+      gl.linkProgram(prog);
+      gl.useProgram(prog);
+
+      // fullscreen triangle
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const posLoc = gl.getAttribLocation(prog, "position");
+      gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+      const U = {};
+      ["iTime", "iResolution", "enableRainbow", "gridColor", "rippleIntensity", "gridSize",
+       "gridThickness", "fadeDistance", "vignetteStrength", "glowIntensity", "opacity",
+       "gridRotation", "mouseInteraction", "mousePosition", "mouseInfluence",
+       "mouseInteractionRadius"].forEach(n => { U[n] = gl.getUniformLocation(prog, n); });
+
+      function hexToRgb(hex) {
+        const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return m ? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255] : [1, 1, 1];
+      }
+
+      gl.uniform1i(U.enableRainbow, opts.enableRainbow ? 1 : 0);
+      gl.uniform3fv(U.gridColor, hexToRgb(opts.gridColor));
+      gl.uniform1f(U.rippleIntensity, opts.rippleIntensity);
+      gl.uniform1f(U.gridSize, opts.gridSize);
+      gl.uniform1f(U.gridThickness, opts.gridThickness);
+      gl.uniform1f(U.fadeDistance, opts.fadeDistance);
+      gl.uniform1f(U.vignetteStrength, opts.vignetteStrength);
+      gl.uniform1f(U.glowIntensity, opts.glowIntensity);
+      gl.uniform1f(U.opacity, opts.opacity);
+      gl.uniform1f(U.gridRotation, opts.gridRotation);
+      gl.uniform1i(U.mouseInteraction, opts.mouseInteraction ? 1 : 0);
+      gl.uniform2f(U.mousePosition, 0.5, 0.5);
+      gl.uniform1f(U.mouseInfluence, 0);
+      gl.uniform1f(U.mouseInteractionRadius, opts.mouseInteractionRadius);
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = container.clientWidth, h = container.clientHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform2f(U.iResolution, w, h);
+      }
+      window.addEventListener("resize", resize);
+      resize();
+      // re-measure when the container gets its real size (e.g. load in a hidden tab)
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => { resize(); draw(performance.now()); }).observe(container);
+      }
+
+      const mouse = { x: 0.5, y: 0.5 };
+      const targetMouse = { x: 0.5, y: 0.5 };
+      let influence = 0, targetInfluence = 0;
+
+      if (opts.mouseInteraction) {
+        // the layer is fixed and pointer-events:none, so track the whole document
+        document.addEventListener("mousemove", e => {
+          targetMouse.x = e.clientX / window.innerWidth;
+          targetMouse.y = 1 - e.clientY / window.innerHeight;
+          targetInfluence = 1;
+        });
+        document.documentElement.addEventListener("mouseleave", () => { targetInfluence = 0; });
+      }
+
+      function draw(t) {
+        gl.uniform1f(U.iTime, t * 0.001);
+        mouse.x += (targetMouse.x - mouse.x) * 0.1;
+        mouse.y += (targetMouse.y - mouse.y) * 0.1;
+        influence += (targetInfluence - influence) * 0.05;
+        gl.uniform2f(U.mousePosition, mouse.x, mouse.y);
+        gl.uniform1f(U.mouseInfluence, influence);
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        draw(0); // single static frame
+        return;
+      }
+
+      (function loop(t) {
+        draw(t || 0);
+        requestAnimationFrame(loop);
+      })(0);
     })();
   </script>
 </body>
