@@ -883,7 +883,7 @@
       --background-y: 50%;
       --grain: none;
       --icon: none;
-      --behind-glow-color: rgba(125, 190, 255, 0.67);
+      --behind-glow-color: rgba(125, 190, 255, 0.3);
       --behind-glow-size: 50%;
       --inner-gradient: linear-gradient(145deg, #38bdf88c 0%, #71C4FF44 100%);
       --sunpillar-1: hsl(2, 100%, 73%);
@@ -917,7 +917,7 @@
         transparent var(--behind-glow-size)
       );
       filter: blur(50px) saturate(1.1);
-      opacity: calc(0.8 * var(--card-opacity));
+      opacity: calc(0.45 * var(--card-opacity));
       transition: opacity 200ms ease;
     }
 
@@ -2430,9 +2430,9 @@
         gridSize: 12,
         gridThickness: 28,
         fadeDistance: 1.6,
-        vignetteStrength: 2.8,
+        vignetteStrength: 8,   // high strength = thin dark rim only, sides stay lit
         glowIntensity: 0.15,
-        opacity: 0.5,
+        opacity: 0.6,
         gridRotation: 0,
         mouseInteraction: true,
         mouseInteractionRadius: 1.9
@@ -2516,7 +2516,8 @@ void main() {
         color += glowIntensity * exp(-gridThickness * 0.5 * smoothB.y);
     }
 
-    float ddd = exp(-2.0 * clamp(pow(dist, fadeDistance), 0.0, 1.0));
+    // inverted fade: grid fades OUT in the middle and shows at the sides
+    float ddd = 1.0 - exp(-2.0 * clamp(pow(dist, fadeDistance), 0.0, 1.0));
 
     vec2 vignetteCoords = vUv - 0.5;
     float vignetteDistance = length(vignetteCoords);
