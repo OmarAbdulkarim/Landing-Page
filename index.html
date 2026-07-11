@@ -128,30 +128,29 @@
       border-bottom: 1px solid var(--line);
     }
 
-    /* letter-glitch field (ported from React Bits <LetterGlitch/>) */
-    .glitch-field {
+    /* animated shape grid (ported from React Bits <ShapeGrid/>) */
+    .shapegrid-field {
       position: absolute;
       inset: 56px 0 0 0;
       overflow: hidden;
     }
 
-    .glitch-field canvas {
+    .shapegrid-field canvas {
       display: block;
       width: 100%;
       height: 100%;
-      opacity: 0.6;
     }
 
-    /* white vignette keeps the hero text readable over the glitch */
-    .glitch-field::after {
+    /* white vignette keeps the hero text readable over the grid */
+    .shapegrid-field::after {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
       background: radial-gradient(ellipse at center,
-        rgba(255,255,255,0.2) 0%,
-        rgba(255,255,255,0.55) 55%,
-        rgba(255,255,255,0.95) 100%);
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.3) 55%,
+        rgba(255,255,255,0.85) 100%);
     }
 
     /* corner registration marks */
@@ -848,7 +847,7 @@
   </nav>
 
   <header id="top">
-    <div class="glitch-field" aria-hidden="true"><canvas id="glitch-canvas"></canvas></div>
+    <div class="shapegrid-field" aria-hidden="true"><canvas id="shapegrid-canvas"></canvas></div>
     <span class="reg tl"></span><span class="reg tr"></span>
     <span class="reg bl"></span><span class="reg br"></span>
     <div class="hero-meta">
@@ -1376,113 +1375,131 @@
     document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
 
     // ============================================================
-    // HERO LETTER GLITCH — vanilla port of React Bits <LetterGlitch/>
+    // HERO SHAPE GRID — vanilla port of React Bits <ShapeGrid/>
     // ============================================================
     (function () {
-      const canvas = document.getElementById("glitch-canvas");
+      const canvas = document.getElementById("shapegrid-canvas");
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
 
-      const glitchColors = ["#e3f0fb", "#cfe6f7", "#a5c9e8", "#a5c9e8", "#7fb5dd", "#0284c7"];
-      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$&*()-_+=/[]{};:<>.,0123456789";
-      const glitchSpeed = 50;
-      const smooth = true;
-      const fontSize = 16, charWidth = 10, charHeight = 20;
+      const direction = "diagonal";       // up, down, left, right, diagonal
+      const speed = 0.47;
+      const squareSize = 40;
+      const borderColor = "#cfe4f6";
+      const hoverFillColor = "#a8e8fe";
+      const hoverTrailAmount = 6;         // trailing hovered squares (0 = no trail)
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      let letters = [], columns = 0, rows = 0;
-      let lastGlitchTime = Date.now(), rafId = null;
-
-      const randomChar = () => characters[Math.floor(Math.random() * characters.length)];
-
-      function hexToRgb(hex) {
-        const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
-      }
-
-      const palette = glitchColors.map(hexToRgb);
-      const randomColor = () => palette[Math.floor(Math.random() * palette.length)];
-
-      function lerp(a, b, t) {
-        return {
-          r: Math.round(a.r + (b.r - a.r) * t),
-          g: Math.round(a.g + (b.g - a.g) * t),
-          b: Math.round(a.b + (b.b - a.b) * t)
-        };
-      }
+      const gridOffset = { x: 0, y: 0 };
+      let hovered = null;
+      const trailCells = [];
+      const cellOpacities = new Map();
 
       function resizeCanvas() {
-        const parent = canvas.parentElement;
-        const dpr = window.devicePixelRatio || 1;
-        const rect = parent.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        columns = Math.ceil(rect.width / charWidth);
-        rows = Math.ceil(rect.height / charHeight);
-        letters = Array.from({ length: columns * rows }, () => {
-          const c = randomColor();
-          return { char: randomChar(), color: c, target: c, progress: 1 };
-        });
-        drawLetters();
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
       }
 
-      function drawLetters() {
-        const rect = canvas.parentElement.getBoundingClientRect();
-        ctx.clearRect(0, 0, rect.width, rect.height);
-        ctx.font = fontSize + "px monospace";
-        ctx.textBaseline = "top";
-        letters.forEach((letter, i) => {
-          const c = letter.progress < 1 ? lerp(letter.color, letter.target, letter.progress) : letter.target;
-          ctx.fillStyle = "rgb(" + c.r + "," + c.g + "," + c.b + ")";
-          ctx.fillText(letter.char, (i % columns) * charWidth, Math.floor(i / columns) * charHeight);
-        });
-      }
+      function drawGrid() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const offsetX = ((gridOffset.x % squareSize) + squareSize) % squareSize;
+        const offsetY = ((gridOffset.y % squareSize) + squareSize) % squareSize;
+        const cols = Math.ceil(canvas.width / squareSize) + 3;
+        const rows = Math.ceil(canvas.height / squareSize) + 3;
 
-      function updateLetters() {
-        const updateCount = Math.max(1, Math.floor(letters.length * 0.05));
-        for (let i = 0; i < updateCount; i++) {
-          const idx = Math.floor(Math.random() * letters.length);
-          const letter = letters[idx];
-          letter.char = randomChar();
-          letter.color = letter.progress < 1 ? lerp(letter.color, letter.target, letter.progress) : letter.target;
-          letter.target = randomColor();
-          letter.progress = smooth ? 0 : 1;
-        }
-      }
-
-      function animate() {
-        const now = Date.now();
-        let needsRedraw = false;
-        if (now - lastGlitchTime >= glitchSpeed) {
-          updateLetters();
-          lastGlitchTime = now;
-          needsRedraw = true;
-        }
-        if (smooth) {
-          letters.forEach(l => {
-            if (l.progress < 1) {
-              l.progress = Math.min(1, l.progress + 0.05);
-              needsRedraw = true;
+        for (let col = -2; col < cols; col++) {
+          for (let row = -2; row < rows; row++) {
+            const sx = col * squareSize + offsetX;
+            const sy = row * squareSize + offsetY;
+            const alpha = cellOpacities.get(col + "," + row);
+            if (alpha) {
+              ctx.globalAlpha = alpha;
+              ctx.fillStyle = hoverFillColor;
+              ctx.fillRect(sx, sy, squareSize, squareSize);
+              ctx.globalAlpha = 1;
             }
-          });
+            ctx.strokeStyle = borderColor;
+            ctx.strokeRect(sx, sy, squareSize, squareSize);
+          }
         }
-        if (needsRedraw) drawLetters();
-        rafId = requestAnimationFrame(animate);
       }
 
-      resizeCanvas();
-      if (!reduceMotion) animate();
+      function updateCellOpacities() {
+        const targets = new Map();
+        if (hovered) targets.set(hovered.x + "," + hovered.y, 1);
+        if (hoverTrailAmount > 0) {
+          for (let i = 0; i < trailCells.length; i++) {
+            const key = trailCells[i].x + "," + trailCells[i].y;
+            if (!targets.has(key)) {
+              targets.set(key, (trailCells.length - i) / (trailCells.length + 1));
+            }
+          }
+        }
+        targets.forEach((_, key) => {
+          if (!cellOpacities.has(key)) cellOpacities.set(key, 0);
+        });
+        cellOpacities.forEach((opacity, key) => {
+          const target = targets.get(key) || 0;
+          const next = opacity + (target - opacity) * 0.15;
+          if (next < 0.005) cellOpacities.delete(key);
+          else cellOpacities.set(key, next);
+        });
+      }
+
+      function updateAnimation() {
+        const s = Math.max(speed, 0.1);
+        switch (direction) {
+          case "right":    gridOffset.x = (gridOffset.x - s + squareSize) % squareSize; break;
+          case "left":     gridOffset.x = (gridOffset.x + s + squareSize) % squareSize; break;
+          case "up":       gridOffset.y = (gridOffset.y + s + squareSize) % squareSize; break;
+          case "down":     gridOffset.y = (gridOffset.y - s + squareSize) % squareSize; break;
+          case "diagonal":
+            gridOffset.x = (gridOffset.x - s + squareSize) % squareSize;
+            gridOffset.y = (gridOffset.y - s + squareSize) % squareSize;
+            break;
+        }
+        updateCellOpacities();
+        drawGrid();
+        requestAnimationFrame(updateAnimation);
+      }
+
+      function pushTrail() {
+        if (hovered && hoverTrailAmount > 0) {
+          trailCells.unshift({ x: hovered.x, y: hovered.y });
+          if (trailCells.length > hoverTrailAmount) trailCells.length = hoverTrailAmount;
+        }
+      }
+
+      // listen on the whole hero so hover works over the text content too
+      const hero = document.querySelector("header");
+      hero.addEventListener("mousemove", e => {
+        const rect = canvas.getBoundingClientRect();
+        const offsetX = ((gridOffset.x % squareSize) + squareSize) % squareSize;
+        const offsetY = ((gridOffset.y % squareSize) + squareSize) % squareSize;
+        const col = Math.floor((e.clientX - rect.left - offsetX) / squareSize);
+        const row = Math.floor((e.clientY - rect.top - offsetY) / squareSize);
+        if (!hovered || hovered.x !== col || hovered.y !== row) {
+          pushTrail();
+          hovered = { x: col, y: row };
+        }
+      });
+      hero.addEventListener("mouseleave", () => {
+        pushTrail();
+        hovered = null;
+      });
 
       let resizeTimeout;
       window.addEventListener("resize", () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-          if (rafId) cancelAnimationFrame(rafId);
           resizeCanvas();
-          if (!reduceMotion) animate();
+          if (reduceMotion) drawGrid();
         }, 100);
       });
+
+      resizeCanvas();
+      if (reduceMotion) drawGrid();
+      else updateAnimation();
     })();
   </script>
 </body>
