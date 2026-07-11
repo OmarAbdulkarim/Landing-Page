@@ -462,40 +462,73 @@
 
     .proj-viz { width: 90px; height: 36px; opacity: 0.7; transition: opacity 0.2s; }
     .proj-viz svg { width: 100%; height: 100%; display: block; }
-    .proj-summary:hover .proj-viz { opacity: 1; }
+    .scroll-stack-card:hover .proj-viz { opacity: 1; }
 
-    /* ================= PROJECTS ================= */
-    .proj-index {
-      border-top: 1px solid var(--line);
+    /* ================= PROJECTS — SCROLL STACK ================= */
+    /* ported from React Bits <ScrollStack/> (window-scroll variant) */
+    .scroll-stack-inner {
+      padding: 2vh 0 24rem;
     }
 
-    .proj-row {
-      border-bottom: 1px solid var(--line);
+    .scroll-stack-card {
+      position: relative;
+      height: 20rem;
+      width: 100%;
+      margin: 30px 0;
+      padding: 2.5rem 3rem;
+      box-sizing: border-box;
+      background: var(--paper);
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      box-shadow: 0 24px 60px rgba(20, 50, 78, 0.1);
+      transform-origin: top center;
+      will-change: transform;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow: hidden;
     }
 
-    .proj-summary {
-      display: grid;
-      grid-template-columns: 70px 1.5fr 0.9fr 100px 90px 32px;
-      gap: 20px;
+    .scroll-stack-end { width: 100%; height: 1px; }
+
+    .stack-head {
+      display: flex;
       align-items: center;
-      padding: 26px 8px;
-      cursor: pointer;
-      transition: background 0.2s, padding-left 0.2s;
-      user-select: none;
+      gap: 24px;
     }
 
-    .proj-summary:hover { background: var(--paper-raise); padding-left: 20px; }
+    .stack-head .proj-viz { margin-left: auto; }
+
+    .stack-title {
+      font-size: clamp(1.2rem, 2.6vw, 1.8rem);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .stack-desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 760px;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .stack-foot {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
 
     .proj-id {
       font-family: var(--mono);
       font-size: 12px;
       color: var(--muted);
-    }
-
-    .proj-title {
-      font-size: clamp(1.05rem, 2.2vw, 1.45rem);
-      font-weight: 600;
-      letter-spacing: -0.01em;
     }
 
     .proj-cat {
@@ -513,43 +546,10 @@
       text-align: right;
     }
 
-    .proj-toggle {
-      font-family: var(--mono);
-      font-size: 16px;
-      color: var(--muted);
-      text-align: center;
-      transition: transform 0.3s, color 0.3s;
-    }
-
-    .proj-row.open .proj-toggle { transform: rotate(45deg); color: var(--accent); }
-
-    .proj-detail {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease;
-    }
-
-    .proj-detail-inner {
-      padding: 8px 8px 34px calc(70px + 28px);
-      display: flex;
-      gap: 48px;
-      flex-wrap: wrap;
-      align-items: flex-start;
-    }
-
-    .proj-desc {
-      color: var(--muted);
-      max-width: 520px;
-      font-size: 0.95rem;
-    }
-
-    .proj-side { flex: 1; min-width: 200px; }
-
     .proj-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 18px;
     }
 
     .tag {
@@ -822,9 +822,10 @@
       .hero-meta { display: none; }
       .disc-row { grid-template-columns: 48px 1fr 24px; }
       .disc-desc, .disc-viz { display: none; }
-      .proj-summary { grid-template-columns: 48px 1fr 24px; }
-      .proj-cat, .proj-year, .proj-viz { display: none; }
-      .proj-detail-inner { padding-left: 8px; flex-direction: column; gap: 24px; }
+      .scroll-stack-card { height: auto; min-height: 18rem; padding: 1.5rem; }
+      .stack-head .proj-viz { display: none; }
+      .stack-desc { -webkit-line-clamp: 6; }
+      .scroll-stack-inner { padding-bottom: 18rem; }
       .stats { grid-template-columns: 1fr; }
       .approach { grid-template-columns: 1fr; gap: 40px; }
       section { padding: 72px 0; }
@@ -974,7 +975,7 @@
         </div>
         <p class="sec-note" id="proj-count">— entries on file</p>
       </div>
-      <div class="proj-index" id="proj-index"></div>
+      <div class="scroll-stack-inner" id="proj-index"></div>
     </div>
   </section>
 
@@ -1309,35 +1310,112 @@
 
     const idx = document.getElementById("proj-index");
     projects.forEach((p, i) => {
-      const row = document.createElement("div");
-      row.className = "proj-row";
-      row.innerHTML = `
-        <div class="proj-summary">
+      const card = document.createElement("div");
+      card.className = "scroll-stack-card";
+      card.innerHTML = `
+        <div class="stack-head">
           <span class="proj-id">${String(i + 1).padStart(3, "0")}</span>
-          <span class="proj-title">${p.title}</span>
           <span class="proj-cat">${p.category}</span>
           <span class="proj-viz">${VIZ[p.viz] || ""}</span>
           <span class="proj-year">${p.year}</span>
-          <span class="proj-toggle">+</span>
         </div>
-        <div class="proj-detail">
-          <div class="proj-detail-inner">
-            <p class="proj-desc">${p.description}</p>
-            <div class="proj-side">
-              <div class="proj-tags">${p.tech.map(t => `<span class="tag">${t}</span>`).join("")}</div>
-              ${p.link ? `<a class="proj-link" href="${p.link}" target="_blank" rel="noopener">View project ↗</a>` : ""}
-            </div>
-          </div>
+        <h3 class="stack-title">${p.title}</h3>
+        <p class="stack-desc">${p.description}</p>
+        <div class="stack-foot">
+          <div class="proj-tags">${p.tech.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+          ${p.link ? `<a class="proj-link" href="${p.link}" target="_blank" rel="noopener">View project ↗</a>` : ""}
         </div>
       `;
-      const summary = row.querySelector(".proj-summary");
-      const detail = row.querySelector(".proj-detail");
-      summary.addEventListener("click", () => {
-        const open = row.classList.toggle("open");
-        detail.style.maxHeight = open ? detail.scrollHeight + "px" : "0";
-      });
-      idx.appendChild(row);
+      idx.appendChild(card);
     });
+    idx.insertAdjacentHTML("beforeend", '<div class="scroll-stack-end"></div>');
+
+    // ============================================================
+    // SCROLL STACK — vanilla port of React Bits <ScrollStack/>
+    // (window-scroll variant, native scrolling instead of Lenis)
+    // ============================================================
+    (function () {
+      const cards = Array.from(document.querySelectorAll(".scroll-stack-card"));
+      const endEl = document.querySelector(".scroll-stack-end");
+      if (!cards.length || !endEl) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const itemDistance = 100;
+      const itemScale = 0.03;
+      const itemStackDistance = 30;
+      const stackPositionPct = 0.20;
+      const scaleEndPct = 0.10;
+      const baseScale = 0.85;
+
+      const lastTransforms = new Map();
+
+      cards.forEach((card, i) => {
+        if (i < cards.length - 1) card.style.marginBottom = itemDistance + "px";
+      });
+
+      // layout offset from document top — unaffected by the transforms we apply
+      function docTop(el) {
+        let t = 0;
+        while (el) { t += el.offsetTop; el = el.offsetParent; }
+        return t;
+      }
+
+      function progress(v, a, b) {
+        return v < a ? 0 : v > b ? 1 : (v - a) / (b - a);
+      }
+
+      function update() {
+        const scrollTop = window.scrollY;
+        const vh = window.innerHeight;
+        const stackPos = vh * stackPositionPct;
+        const scaleEnd = vh * scaleEndPct;
+        const endTop = docTop(endEl);
+        const tops = cards.map(docTop);
+
+        cards.forEach((card, i) => {
+          const cardTop = tops[i];
+          const triggerStart = cardTop - stackPos - itemStackDistance * i;
+          const triggerEnd = cardTop - scaleEnd;
+          const pinStart = triggerStart;
+          const pinEnd = endTop - vh / 2;
+
+          const scaleProgress = progress(scrollTop, triggerStart, triggerEnd);
+          const targetScale = baseScale + i * itemScale;
+          const scale = 1 - scaleProgress * (1 - targetScale);
+
+          let translateY = 0;
+          if (scrollTop >= pinStart && scrollTop <= pinEnd) {
+            translateY = scrollTop - cardTop + stackPos + itemStackDistance * i;
+          } else if (scrollTop > pinEnd) {
+            translateY = pinEnd - cardTop + stackPos + itemStackDistance * i;
+          }
+
+          const next = {
+            translateY: Math.round(translateY * 100) / 100,
+            scale: Math.round(scale * 1000) / 1000
+          };
+          const prev = lastTransforms.get(i);
+          if (!prev || Math.abs(prev.translateY - next.translateY) > 0.1 ||
+              Math.abs(prev.scale - next.scale) > 0.001) {
+            card.style.transform =
+              "translate3d(0, " + next.translateY + "px, 0) scale(" + next.scale + ")";
+            lastTransforms.set(i, next);
+          }
+        });
+      }
+
+      let ticking = false;
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { update(); ticking = false; });
+      }
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+      window.addEventListener("load", update);
+      update();
+    })();
 
     // Counters
     document.getElementById("proj-count").textContent =
