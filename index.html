@@ -430,153 +430,87 @@
     }
 
     /* ================= DISCIPLINES ================= */
-    .disc-row {
+    .skills-grid {
       display: grid;
-      grid-template-columns: 90px 1fr 1.2fr 120px 32px;
-      gap: 24px;
-      align-items: center;
-      padding: 32px 28px;
+      grid-template-columns: 1fr 1fr;
+      gap: 26px;
+    }
+
+    /* ============ ELECTRIC BORDER (ported from React Bits <ElectricBorder/>) ============ */
+    .electric-card {
+      --electric-border-color: var(--accent);
+      --electric-light-color: color-mix(in srgb, var(--electric-border-color) 80%, #ffffff);
       position: relative;
+      border-radius: 14px;
+      isolation: isolate;
+      overflow: visible;
+      background: var(--paper-raise);
       cursor: default;
     }
 
-    /* ============ BORDER GLOW (ported from React Bits <BorderGlow/>) ============ */
-    .border-glow-card {
-      --edge-proximity: 0;
-      --cursor-angle: 45deg;
-      --edge-sensitivity: 7;
-      --color-sensitivity: 27; /* edge-sensitivity + 20 */
-      --cone-spread: 19;
-      --glow-padding: 68px;
-      --card-bg: var(--paper);
-      /* sky-blue glow, intensity 1.2 baked into the alphas */
-      --glow-color: hsl(201deg 95% 65% / 100%);
-      --glow-color-60: hsl(201deg 95% 65% / 72%);
-      --glow-color-50: hsl(201deg 95% 65% / 60%);
-      --glow-color-40: hsl(201deg 95% 65% / 48%);
-      --glow-color-30: hsl(201deg 95% 65% / 36%);
-      --glow-color-20: hsl(201deg 95% 65% / 24%);
-      --glow-color-10: hsl(201deg 95% 65% / 12%);
-
-      position: relative;
-      border-radius: 8px;
-      isolation: isolate;
-      transform: translate3d(0, 0, 0.01px);
-      display: grid;
-      border: 1px solid var(--line-strong);
-      background: var(--card-bg);
-      overflow: visible;
-      box-shadow:
-        rgba(0, 0, 0, 0.05) 0 2px 4px,
-        rgba(0, 0, 0, 0.05) 0 8px 16px;
-      margin-bottom: 18px;
+    .eb-canvas-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 2;
     }
 
-    .border-glow-card::before,
-    .border-glow-card::after,
-    .border-glow-card > .edge-light {
-      content: "";
+    .eb-canvas { display: block; }
+
+    .eb-layers {
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      transition: opacity 0.25s ease-out;
-      z-index: -1;
-    }
-
-    .border-glow-card:not(:hover):not(.sweep-active)::before,
-    .border-glow-card:not(:hover):not(.sweep-active)::after,
-    .border-glow-card:not(:hover):not(.sweep-active) > .edge-light {
-      opacity: 0;
-      transition: opacity 0.75s ease-in-out;
-    }
-
-    /* colored mesh-gradient border — blue / light blue / brown */
-    .border-glow-card::before {
-      border: 1px solid transparent;
-      background:
-        linear-gradient(var(--card-bg) 0 100%) padding-box,
-        linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
-        radial-gradient(at 80% 55%, #38bdf8 0px, transparent 50%) border-box,
-        radial-gradient(at 69% 34%, #a8e8fe 0px, transparent 50%) border-box,
-        radial-gradient(at 8% 6%, #9b8ec4 0px, transparent 50%) border-box,
-        radial-gradient(at 41% 38%, #38bdf8 0px, transparent 50%) border-box,
-        radial-gradient(at 86% 85%, #a8e8fe 0px, transparent 50%) border-box,
-        radial-gradient(at 82% 18%, #9b8ec4 0px, transparent 50%) border-box,
-        radial-gradient(at 51% 4%, #a8e8fe 0px, transparent 50%) border-box,
-        linear-gradient(#38bdf8 0 100%) border-box;
-      opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
-      mask-image: conic-gradient(
-        from var(--cursor-angle) at center,
-        black calc(var(--cone-spread) * 1%),
-        transparent calc((var(--cone-spread) + 15) * 1%),
-        transparent calc((100 - var(--cone-spread) - 15) * 1%),
-        black calc((100 - var(--cone-spread)) * 1%)
-      );
-    }
-
-    /* colored mesh-gradient fill near edges */
-    .border-glow-card::after {
-      border: 1px solid transparent;
-      background:
-        radial-gradient(at 80% 55%, #38bdf8 0px, transparent 50%) padding-box,
-        radial-gradient(at 69% 34%, #a8e8fe 0px, transparent 50%) padding-box,
-        radial-gradient(at 8% 6%, #9b8ec4 0px, transparent 50%) padding-box,
-        radial-gradient(at 41% 38%, #38bdf8 0px, transparent 50%) padding-box,
-        radial-gradient(at 86% 85%, #a8e8fe 0px, transparent 50%) padding-box,
-        radial-gradient(at 82% 18%, #9b8ec4 0px, transparent 50%) padding-box,
-        radial-gradient(at 51% 4%, #a8e8fe 0px, transparent 50%) padding-box,
-        linear-gradient(#38bdf8 0 100%) padding-box;
-      mask-image:
-        linear-gradient(to bottom, black, black),
-        radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
-        radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
-        radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
-        radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
-        radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
-        conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
-      mask-composite: subtract, add, add, add, add, add;
-      opacity: calc(0.5 * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
-      mix-blend-mode: soft-light;
-    }
-
-    /* outer glow layer — normal blend (plus-lighter is invisible on white) */
-    .border-glow-card > .edge-light {
-      inset: calc(var(--glow-padding) * -1);
       pointer-events: none;
-      z-index: 1;
-      mask-image: conic-gradient(
-        from var(--cursor-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%
-      );
-      opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+      z-index: 0;
     }
 
-    .border-glow-card > .edge-light::before {
-      content: "";
+    .eb-glow-1,
+    .eb-glow-2,
+    .eb-background-glow {
       position: absolute;
-      inset: var(--glow-padding);
+      inset: 0;
       border-radius: inherit;
-      box-shadow:
-        inset 0 0 0 1px var(--glow-color),
-        inset 0 0 1px 0 var(--glow-color-60),
-        inset 0 0 3px 0 var(--glow-color-50),
-        inset 0 0 6px 0 var(--glow-color-40),
-        inset 0 0 15px 0 var(--glow-color-30),
-        inset 0 0 25px 2px var(--glow-color-20),
-        inset 0 0 50px 2px var(--glow-color-10),
-        0 0 1px 0 var(--glow-color-60),
-        0 0 3px 0 var(--glow-color-50),
-        0 0 6px 0 var(--glow-color-40),
-        0 0 15px 0 var(--glow-color-30),
-        0 0 25px 2px var(--glow-color-20),
-        0 0 50px 2px var(--glow-color-10);
+      pointer-events: none;
+      box-sizing: border-box;
     }
 
-    .border-glow-inner {
+    .eb-glow-1 {
+      border: 2px solid color-mix(in srgb, var(--electric-border-color) 60%, transparent);
+      filter: blur(1px);
+    }
+
+    .eb-glow-2 {
+      border: 2px solid var(--electric-light-color);
+      filter: blur(4px);
+    }
+
+    .eb-background-glow {
+      z-index: -1;
+      transform: scale(1.08);
+      filter: blur(32px);
+      opacity: 0.22;
+      background: linear-gradient(-30deg, var(--electric-light-color), transparent, var(--electric-border-color));
+    }
+
+    .eb-content {
+      position: relative;
+      border-radius: inherit;
+      z-index: 1;
       display: flex;
       flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      z-index: 1;
+      gap: 14px;
+      height: 100%;
+      padding: 30px 28px;
+      box-sizing: border-box;
+    }
+
+    .disc-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .disc-num {
@@ -586,7 +520,7 @@
       transition: color 0.25s;
     }
 
-    .disc-row:hover .disc-num { color: var(--accent); }
+    .electric-card:hover .disc-num { color: var(--accent); }
 
     .disc-name {
       font-size: clamp(1.4rem, 3vw, 2.1rem);
@@ -607,11 +541,11 @@
       transition: color 0.25s, transform 0.25s;
     }
 
-    .disc-row:hover .disc-arrow { color: var(--accent); transform: translateX(4px); }
+    .electric-card:hover .disc-arrow { color: var(--accent); transform: translateX(4px); }
 
-    .disc-viz { width: 110px; height: 44px; opacity: 0.75; transition: opacity 0.25s; }
+    .disc-viz { width: 110px; height: 44px; opacity: 0.75; transition: opacity 0.25s; margin-top: auto; }
     .disc-viz svg { width: 100%; height: 100%; display: block; }
-    .disc-row:hover .disc-viz { opacity: 1; }
+    .electric-card:hover .disc-viz { opacity: 1; }
 
     .proj-viz { width: 90px; height: 36px; opacity: 0.7; transition: opacity 0.2s; }
     .proj-viz svg { width: 100%; height: 100%; display: block; }
@@ -1411,8 +1345,7 @@
     @media (max-width: 820px) {
       .nav-links a { padding: 0 12px; }
       .hero-meta { display: none; }
-      .disc-row { grid-template-columns: 48px 1fr 24px; }
-      .disc-desc, .disc-viz { display: none; }
+      .skills-grid { grid-template-columns: 1fr; }
       .scroll-stack-card { height: auto; min-height: 18rem; padding: 1.5rem; }
       .stack-head .proj-viz { display: none; }
       .stack-desc { -webkit-line-clamp: 6; }
@@ -1490,9 +1423,12 @@
         <p class="sec-note">Read → Model → Prove → Report</p>
       </div>
 
-      <div class="border-glow-card reveal"><span class="edge-light"></span><div class="border-glow-inner">
-      <div class="disc-row">
-        <span class="disc-num">/ 01</span>
+      <div class="skills-grid">
+      <div class="electric-card reveal">
+        <div class="eb-canvas-container"><canvas class="eb-canvas"></canvas></div>
+        <div class="eb-layers"><div class="eb-glow-1"></div><div class="eb-glow-2"></div><div class="eb-background-glow"></div></div>
+        <div class="eb-content">
+        <div class="disc-top"><span class="disc-num">/ 01</span><span class="disc-arrow">→</span></div>
         <span class="disc-name">Schedule Analysis</span>
         <span class="disc-desc">Baselines, critical paths, and program health checks across a live portfolio — finding the slippage before it finds the completion date.</span>
         <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
@@ -1507,12 +1443,13 @@
           <text x="90" y="11" font-family="IBM Plex Mono, monospace" font-size="7" fill="#9b8ec4">TF+9</text>
           <text x="90" y="39" font-family="IBM Plex Mono, monospace" font-size="7" fill="#38bdf8">TF 0</text>
         </svg></span>
-        <span class="disc-arrow">→</span>
+        </div>
       </div>
-      </div></div>
-      <div class="border-glow-card reveal"><span class="edge-light"></span><div class="border-glow-inner">
-      <div class="disc-row">
-        <span class="disc-num">/ 02</span>
+      <div class="electric-card reveal">
+        <div class="eb-canvas-container"><canvas class="eb-canvas"></canvas></div>
+        <div class="eb-layers"><div class="eb-glow-1"></div><div class="eb-glow-2"></div><div class="eb-background-glow"></div></div>
+        <div class="eb-content">
+        <div class="disc-top"><span class="disc-num">/ 02</span><span class="disc-arrow">→</span></div>
         <span class="disc-name">Delay &amp; Claims</span>
         <span class="disc-desc">Extension of Time claims built on Time-Impact, Window, and Impacted-as-Planned analysis — evidence first, argument second.</span>
         <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
@@ -1527,12 +1464,13 @@
           <path d="M60 33 l4 -2 v4 z M92 33 l-4 -2 v4 z" fill="#38bdf8"/>
           <text x="64" y="43" font-family="IBM Plex Mono, monospace" font-size="7" fill="#38bdf8">Δ 46d</text>
         </svg></span>
-        <span class="disc-arrow">→</span>
+        </div>
       </div>
-      </div></div>
-      <div class="border-glow-card reveal"><span class="edge-light"></span><div class="border-glow-inner">
-      <div class="disc-row">
-        <span class="disc-num">/ 03</span>
+      <div class="electric-card reveal">
+        <div class="eb-canvas-container"><canvas class="eb-canvas"></canvas></div>
+        <div class="eb-layers"><div class="eb-glow-1"></div><div class="eb-glow-2"></div><div class="eb-background-glow"></div></div>
+        <div class="eb-content">
+        <div class="disc-top"><span class="disc-num">/ 03</span><span class="disc-arrow">→</span></div>
         <span class="disc-name">Reporting &amp; Dashboards</span>
         <span class="disc-desc">Weekly and monthly management dashboards that turn raw program updates into progress, risk, and KPI visibility.</span>
         <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
@@ -1545,12 +1483,13 @@
           <circle cx="82" cy="21" r="2.2" fill="#38bdf8"/>
           <text x="60" y="42" font-family="IBM Plex Mono, monospace" font-size="7" fill="#38bdf8">SPI 0.87</text>
         </svg></span>
-        <span class="disc-arrow">→</span>
+        </div>
       </div>
-      </div></div>
-      <div class="border-glow-card reveal"><span class="edge-light"></span><div class="border-glow-inner">
-      <div class="disc-row">
-        <span class="disc-num">/ 04</span>
+      <div class="electric-card reveal">
+        <div class="eb-canvas-container"><canvas class="eb-canvas"></canvas></div>
+        <div class="eb-layers"><div class="eb-glow-1"></div><div class="eb-glow-2"></div><div class="eb-background-glow"></div></div>
+        <div class="eb-content">
+        <div class="disc-top"><span class="disc-num">/ 04</span><span class="disc-arrow">→</span></div>
         <span class="disc-name">Tooling &amp; Automation</span>
         <span class="disc-desc">Power Query, VBA, and macro tools that replace manual controls work — built once, then adopted by the whole team.</span>
         <span class="disc-viz"><svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
@@ -1562,9 +1501,9 @@
           <text x="12" y="36" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#38bdf8">.RunAudit</text>
           <rect class="cur-blink" x="58" y="29" width="5" height="9" fill="#38bdf8"/>
         </svg></span>
-        <span class="disc-arrow">→</span>
+        </div>
       </div>
-      </div></div>
+      </div>
     </div>
   </section>
 
@@ -2257,73 +2196,144 @@
     })();
 
     // ============================================================
-    // SKILLS BORDER GLOW — vanilla port of React Bits <BorderGlow/>
+    // SKILLS ELECTRIC BORDER — vanilla port of React Bits <ElectricBorder/>
     // ============================================================
     (function () {
-      const cards = Array.from(document.querySelectorAll(".border-glow-card"));
+      const cards = Array.from(document.querySelectorAll(".electric-card"));
       if (!cards.length) return;
 
+      const SPEED = 0.8, CHAOS = 0.09, BORDER_RADIUS = 14;
+      const OCTAVES = 10, LACUNARITY = 1.6, GAIN = 0.7, FREQUENCY = 10;
+      const DISPLACEMENT = 60, BORDER_OFFSET = 60;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const random = x => (Math.sin(x * 12.9898) * 43758.5453) % 1;
+
+      function noise2D(x, y) {
+        const i = Math.floor(x), j = Math.floor(y);
+        const fx = x - i, fy = y - j;
+        const a = random(i + j * 57);
+        const b = random(i + 1 + j * 57);
+        const c = random(i + (j + 1) * 57);
+        const d = random(i + 1 + (j + 1) * 57);
+        const ux = fx * fx * (3 - 2 * fx);
+        const uy = fy * fy * (3 - 2 * fy);
+        return a * (1 - ux) * (1 - uy) + b * ux * (1 - uy) + c * (1 - ux) * uy + d * ux * uy;
+      }
+
+      function octavedNoise(x, time, seed) {
+        let y = 0, amplitude = CHAOS, frequency = FREQUENCY;
+        for (let i = 0; i < OCTAVES; i++) {
+          if (i > 0) y += amplitude * noise2D(frequency * x + seed * 100, time * frequency * 0.3);
+          frequency *= LACUNARITY;
+          amplitude *= GAIN;
+        }
+        return y;
+      }
+
+      function cornerPoint(cx, cy, r, startAngle, progress) {
+        const angle = startAngle + progress * (Math.PI / 2);
+        return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+      }
+
+      function roundedRectPoint(t, left, top, w, h, r) {
+        const sw = w - 2 * r, sh = h - 2 * r;
+        const arc = (Math.PI * r) / 2;
+        const perim = 2 * sw + 2 * sh + 4 * arc;
+        let d = t * perim, acc = 0;
+
+        if (d <= acc + sw) return { x: left + r + (d - acc), y: top };
+        acc += sw;
+        if (d <= acc + arc) return cornerPoint(left + w - r, top + r, r, -Math.PI / 2, (d - acc) / arc);
+        acc += arc;
+        if (d <= acc + sh) return { x: left + w, y: top + r + (d - acc) };
+        acc += sh;
+        if (d <= acc + arc) return cornerPoint(left + w - r, top + h - r, r, 0, (d - acc) / arc);
+        acc += arc;
+        if (d <= acc + sw) return { x: left + w - r - (d - acc), y: top + h };
+        acc += sw;
+        if (d <= acc + arc) return cornerPoint(left + r, top + h - r, r, Math.PI / 2, (d - acc) / arc);
+        acc += arc;
+        if (d <= acc + sh) return { x: left, y: top + h - r - (d - acc) };
+        acc += sh;
+        return cornerPoint(left + r, top + r, r, Math.PI, (d - acc) / arc);
+      }
+
       cards.forEach(card => {
-        card.addEventListener("pointermove", e => {
+        const canvas = card.querySelector(".eb-canvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const color = getComputedStyle(card).getPropertyValue("--electric-border-color").trim() || "#38bdf8";
+
+        let width = 0, height = 0, time = 0, lastFrame = 0, rafId = null;
+
+        function updateSize() {
           const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const cx = rect.width / 2, cy = rect.height / 2;
-          const dx = x - cx, dy = y - cy;
-          const kx = dx !== 0 ? cx / Math.abs(dx) : Infinity;
-          const ky = dy !== 0 ? cy / Math.abs(dy) : Infinity;
-          const edge = Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
-          let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
-          if (angle < 0) angle += 360;
-          card.style.setProperty("--edge-proximity", (edge * 100).toFixed(3));
-          card.style.setProperty("--cursor-angle", angle.toFixed(3) + "deg");
-        });
-      });
+          width = rect.width + BORDER_OFFSET * 2;
+          height = rect.height + BORDER_OFFSET * 2;
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          canvas.style.width = width + "px";
+          canvas.style.height = height + "px";
+        }
 
-      // intro sweep when each card first scrolls into view
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        function draw(now) {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          if (lastFrame) time += ((now - lastFrame) / 1000) * SPEED;
+          lastFrame = now;
 
-      const easeOutCubic = x => 1 - Math.pow(1 - x, 3);
-      const easeInCubic = x => x * x * x;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.clearRect(0, 0, width, height);
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1.2;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
 
-      function animateValue(opts) {
-        const start = opts.start || 0, end = opts.end === undefined ? 100 : opts.end;
-        const duration = opts.duration || 1000, delay = opts.delay || 0;
-        const ease = opts.ease || easeOutCubic;
-        setTimeout(() => {
-          const t0 = performance.now();
-          (function tick() {
-            const t = Math.min((performance.now() - t0) / duration, 1);
-            opts.onUpdate(start + (end - start) * ease(t));
-            if (t < 1) requestAnimationFrame(tick);
-            else if (opts.onEnd) opts.onEnd();
-          })();
-        }, delay);
-      }
+          const bw = width - 2 * BORDER_OFFSET;
+          const bh = height - 2 * BORDER_OFFSET;
+          const radius = Math.min(BORDER_RADIUS, Math.min(bw, bh) / 2);
+          const perim = 2 * (bw + bh) + 2 * Math.PI * radius;
+          const samples = Math.floor(perim / 2);
 
-      function sweep(card) {
-        const angleStart = 110, angleEnd = 465;
-        card.classList.add("sweep-active");
-        card.style.setProperty("--cursor-angle", angleStart + "deg");
-        animateValue({ duration: 500, onUpdate: v => card.style.setProperty("--edge-proximity", v) });
-        animateValue({ ease: easeInCubic, duration: 1500, end: 50, onUpdate: v =>
-          card.style.setProperty("--cursor-angle", ((angleEnd - angleStart) * (v / 100) + angleStart) + "deg") });
-        animateValue({ ease: easeOutCubic, delay: 1500, duration: 2250, start: 50, end: 100, onUpdate: v =>
-          card.style.setProperty("--cursor-angle", ((angleEnd - angleStart) * (v / 100) + angleStart) + "deg") });
-        animateValue({ ease: easeInCubic, delay: 2500, duration: 1500, start: 100, end: 0,
-          onUpdate: v => card.style.setProperty("--edge-proximity", v),
-          onEnd: () => card.classList.remove("sweep-active") });
-      }
-
-      const sweepObserver = new IntersectionObserver(entries => {
-        entries.forEach(en => {
-          if (en.isIntersecting) {
-            sweep(en.target);
-            sweepObserver.unobserve(en.target);
+          ctx.beginPath();
+          for (let i = 0; i <= samples; i++) {
+            const p = i / samples;
+            const pt = roundedRectPoint(p, BORDER_OFFSET, BORDER_OFFSET, bw, bh, radius);
+            const x = pt.x + octavedNoise(p * 8, time, 0) * DISPLACEMENT;
+            const y = pt.y + octavedNoise(p * 8, time, 1) * DISPLACEMENT;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
           }
-        });
-      }, { threshold: 0.3 });
-      cards.forEach(c => sweepObserver.observe(c));
+          ctx.closePath();
+          ctx.stroke();
+
+          if (!reduceMotion) rafId = requestAnimationFrame(draw);
+        }
+
+        function start() {
+          if (rafId !== null) return;
+          lastFrame = 0;
+          if (reduceMotion) draw(0);
+          else rafId = requestAnimationFrame(draw);
+        }
+
+        function stop() {
+          if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+        }
+
+        const ro = new ResizeObserver(updateSize);
+        ro.observe(card);
+        updateSize();
+
+        if (reduceMotion) { draw(0); return; }
+
+        // only animate while the card is on screen
+        const io = new IntersectionObserver(entries => {
+          entries.forEach(en => (en.isIntersecting ? start() : stop()));
+        }, { threshold: 0 });
+        io.observe(card);
+      });
     })();
 
     // ============================================================
