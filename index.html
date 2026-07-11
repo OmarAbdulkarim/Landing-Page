@@ -128,24 +128,31 @@
       border-bottom: 1px solid var(--line);
     }
 
-    /* blueprint field */
-    .field {
+    /* letter-glitch field (ported from React Bits <LetterGlitch/>) */
+    .glitch-field {
       position: absolute;
       inset: 56px 0 0 0;
-      background-image:
-        linear-gradient(var(--line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--line) 1px, transparent 1px);
-      background-size: 96px 96px;
-      opacity: 0.5;
+      overflow: hidden;
     }
 
-    .field::before, .field::after {
+    .glitch-field canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      opacity: 0.6;
+    }
+
+    /* white vignette keeps the hero text readable over the glitch */
+    .glitch-field::after {
       content: "";
       position: absolute;
-      background: var(--line-strong);
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center,
+        rgba(255,255,255,0.2) 0%,
+        rgba(255,255,255,0.55) 55%,
+        rgba(255,255,255,0.95) 100%);
     }
-    .field::before { left: 50%; top: 0; bottom: 0; width: 1px; opacity: 0.4; }
-    .field::after { top: 50%; left: 0; right: 0; height: 1px; opacity: 0.4; }
 
     /* corner registration marks */
     .reg {
@@ -841,7 +848,7 @@
   </nav>
 
   <header id="top">
-    <div class="field"></div>
+    <div class="glitch-field" aria-hidden="true"><canvas id="glitch-canvas"></canvas></div>
     <span class="reg tl"></span><span class="reg tr"></span>
     <span class="reg bl"></span><span class="reg br"></span>
     <div class="hero-meta">
@@ -1041,13 +1048,6 @@
     </div>
   </section>
 
-  <section id="contact">
-    <div class="wrap">
-      <p class="contact-kicker">Contact — open for inquiries</p>
-      <a class="email-link" href="mailto:omabdulkarim6@gmail.com">omabdulkarim6@gmail.com</a>
-    </div>
-  </section>
-
   <section class="viz-sec" aria-hidden="true">
     <div class="wrap">
       <div class="viz-head">
@@ -1152,6 +1152,13 @@
           </g>
         </svg>
       </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <p class="contact-kicker">Contact — open for inquiries</p>
+      <a class="email-link" href="mailto:omabdulkarim6@gmail.com">omabdulkarim6@gmail.com</a>
     </div>
   </section>
 
@@ -1367,6 +1374,116 @@
       });
     }, { threshold: 0.12 });
     document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+
+    // ============================================================
+    // HERO LETTER GLITCH — vanilla port of React Bits <LetterGlitch/>
+    // ============================================================
+    (function () {
+      const canvas = document.getElementById("glitch-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+
+      const glitchColors = ["#e3f0fb", "#cfe6f7", "#a5c9e8", "#a5c9e8", "#7fb5dd", "#0284c7"];
+      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$&*()-_+=/[]{};:<>.,0123456789";
+      const glitchSpeed = 50;
+      const smooth = true;
+      const fontSize = 16, charWidth = 10, charHeight = 20;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let letters = [], columns = 0, rows = 0;
+      let lastGlitchTime = Date.now(), rafId = null;
+
+      const randomChar = () => characters[Math.floor(Math.random() * characters.length)];
+
+      function hexToRgb(hex) {
+        const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+      }
+
+      const palette = glitchColors.map(hexToRgb);
+      const randomColor = () => palette[Math.floor(Math.random() * palette.length)];
+
+      function lerp(a, b, t) {
+        return {
+          r: Math.round(a.r + (b.r - a.r) * t),
+          g: Math.round(a.g + (b.g - a.g) * t),
+          b: Math.round(a.b + (b.b - a.b) * t)
+        };
+      }
+
+      function resizeCanvas() {
+        const parent = canvas.parentElement;
+        const dpr = window.devicePixelRatio || 1;
+        const rect = parent.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        columns = Math.ceil(rect.width / charWidth);
+        rows = Math.ceil(rect.height / charHeight);
+        letters = Array.from({ length: columns * rows }, () => {
+          const c = randomColor();
+          return { char: randomChar(), color: c, target: c, progress: 1 };
+        });
+        drawLetters();
+      }
+
+      function drawLetters() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.font = fontSize + "px monospace";
+        ctx.textBaseline = "top";
+        letters.forEach((letter, i) => {
+          const c = letter.progress < 1 ? lerp(letter.color, letter.target, letter.progress) : letter.target;
+          ctx.fillStyle = "rgb(" + c.r + "," + c.g + "," + c.b + ")";
+          ctx.fillText(letter.char, (i % columns) * charWidth, Math.floor(i / columns) * charHeight);
+        });
+      }
+
+      function updateLetters() {
+        const updateCount = Math.max(1, Math.floor(letters.length * 0.05));
+        for (let i = 0; i < updateCount; i++) {
+          const idx = Math.floor(Math.random() * letters.length);
+          const letter = letters[idx];
+          letter.char = randomChar();
+          letter.color = letter.progress < 1 ? lerp(letter.color, letter.target, letter.progress) : letter.target;
+          letter.target = randomColor();
+          letter.progress = smooth ? 0 : 1;
+        }
+      }
+
+      function animate() {
+        const now = Date.now();
+        let needsRedraw = false;
+        if (now - lastGlitchTime >= glitchSpeed) {
+          updateLetters();
+          lastGlitchTime = now;
+          needsRedraw = true;
+        }
+        if (smooth) {
+          letters.forEach(l => {
+            if (l.progress < 1) {
+              l.progress = Math.min(1, l.progress + 0.05);
+              needsRedraw = true;
+            }
+          });
+        }
+        if (needsRedraw) drawLetters();
+        rafId = requestAnimationFrame(animate);
+      }
+
+      resizeCanvas();
+      if (!reduceMotion) animate();
+
+      let resizeTimeout;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          if (rafId) cancelAnimationFrame(rafId);
+          resizeCanvas();
+          if (!reduceMotion) animate();
+        }, 100);
+      });
+    })();
   </script>
 </body>
 </html>
