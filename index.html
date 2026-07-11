@@ -876,15 +876,12 @@
       --pointer-from-center: 0;
       --pointer-from-top: 0.5;
       --pointer-from-left: 0.5;
-      --card-opacity: 0;
       --rotate-x: 0deg;
       --rotate-y: 0deg;
       --background-x: 50%;
       --background-y: 50%;
       --grain: none;
       --icon: none;
-      --behind-glow-color: rgba(125, 190, 255, 0.3);
-      --behind-glow-size: 50%;
       --inner-gradient: linear-gradient(145deg, #38bdf88c 0%, #71C4FF44 100%);
       --sunpillar-1: hsl(2, 100%, 73%);
       --sunpillar-2: hsl(53, 100%, 69%);
@@ -904,26 +901,6 @@
       transform: translate3d(0, 0, 0.1px);
       position: relative;
       touch-action: none;
-    }
-
-    .pc-behind {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background: radial-gradient(
-        circle at var(--pointer-x) var(--pointer-y),
-        var(--behind-glow-color) 0%,
-        transparent var(--behind-glow-size)
-      );
-      filter: blur(50px) saturate(1.1);
-      opacity: calc(0.45 * var(--card-opacity));
-      transition: opacity 200ms ease;
-    }
-
-    .pc-card-wrapper:hover,
-    .pc-card-wrapper.active {
-      --card-opacity: 1;
     }
 
     .pc-card {
@@ -1766,7 +1743,6 @@
     <div class="wrap">
       <div class="profile-card-row">
         <div class="pc-card-wrapper">
-          <div class="pc-behind"></div>
           <div class="pc-card-shell">
             <div class="pc-card">
               <div class="pc-inside">
@@ -2427,7 +2403,7 @@
         enableRainbow: false,
         gridColor: "#8b5cf6",        // theme purple
         rippleIntensity: 0.05,
-        gridSize: 12,
+        gridSize: 17,   // ~30% smaller squares
         gridThickness: 28,
         fadeDistance: 1.6,
         vignetteStrength: 8,   // high strength = thin dark rim only, sides stay lit
@@ -2481,9 +2457,8 @@ void main() {
         uv = rotate(gridRotation * pi / 180.0) * uv;
     }
 
-    float dist = length(uv);
-    float func = sin(pi * (iTime - dist));
-    vec2 rippleUv = uv + uv * func * rippleIntensity;
+    // static grid — only the mouse interaction ripples it
+    vec2 rippleUv = uv;
 
     if (mouseInteraction && mouseInfluence > 0.0) {
         vec2 mouseUv = (mousePosition * 2.0 - 1.0);
@@ -2506,7 +2481,7 @@ void main() {
     );
 
     vec3 color = vec3(0.0);
-    color += exp(-gridThickness * smoothB.x * (0.8 + 0.5 * sin(pi * iTime)));
+    color += exp(-gridThickness * smoothB.x * 0.8);
     color += exp(-gridThickness * smoothB.y);
     color += 0.5 * exp(-(gridThickness / 4.0) * sin(smoothB.x));
     color += 0.5 * exp(-(gridThickness / 3.0) * smoothB.y);
@@ -2516,13 +2491,9 @@ void main() {
         color += glowIntensity * exp(-gridThickness * 0.5 * smoothB.y);
     }
 
-    // inverted fade: grid fades OUT in the middle and shows at the sides
-    float ddd = 1.0 - exp(-2.0 * clamp(pow(dist, fadeDistance), 0.0, 1.0));
-
-    vec2 vignetteCoords = vUv - 0.5;
-    float vignetteDistance = length(vignetteCoords);
-    float vignette = 1.0 - pow(vignetteDistance * 2.0, vignetteStrength);
-    vignette = clamp(vignette, 0.0, 1.0);
+    // two side columns: center band fully clear, outer bands fully visible
+    float cx = abs(vUv.x - 0.5);
+    float ddd = smoothstep(0.2, 0.32, cx);
 
     vec3 t;
     if (enableRainbow) {
@@ -2535,7 +2506,7 @@ void main() {
         t = gridColor;
     }
 
-    float finalFade = ddd * vignette;
+    float finalFade = ddd;
     float alpha = length(color) * finalFade * opacity;
     gl_FragColor = vec4(color * t * finalFade * opacity, alpha);
 }`;
@@ -2616,13 +2587,16 @@ void main() {
       const mouse = { x: 0.5, y: 0.5 };
       const targetMouse = { x: 0.5, y: 0.5 };
       let influence = 0, targetInfluence = 0;
+      let animating = false;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      if (opts.mouseInteraction) {
+      if (opts.mouseInteraction && !reduceMotion) {
         // the layer is fixed and pointer-events:none, so track the whole document
         document.addEventListener("mousemove", e => {
           targetMouse.x = e.clientX / window.innerWidth;
           targetMouse.y = 1 - e.clientY / window.innerHeight;
           targetInfluence = 1;
+          wake();
         });
         document.documentElement.addEventListener("mouseleave", () => { targetInfluence = 0; });
       }
@@ -2639,15 +2613,25 @@ void main() {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       }
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        draw(0); // single static frame
-        return;
+      // static grid by default — animate only while the mouse ripple is active
+      function tick() {
+        draw(performance.now());
+        if (targetInfluence === 0 && influence < 0.004) {
+          influence = 0;
+          animating = false;
+          return;
+        }
+        requestAnimationFrame(tick);
       }
 
-      (function loop(t) {
-        draw(t || 0);
-        requestAnimationFrame(loop);
-      })(0);
+      function wake() {
+        if (!animating) {
+          animating = true;
+          requestAnimationFrame(tick);
+        }
+      }
+
+      draw(0);
     })();
   </script>
 </body>
