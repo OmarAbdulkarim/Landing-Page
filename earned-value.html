@@ -12,8 +12,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
     :root {
-      --paper: #f9f6f0;
-      --paper-raise: #e7f1f8;
+      --paper: #ffffff;
+      --paper-raise: #e9f4fc;
       --ink: #3d2c21;
       --muted: #8a7264;
       --accent: #0284c7;
@@ -21,8 +21,8 @@
       --amber: #c07f10;
       --red: #d64545;
       --blue: #3b82c4;
-      --line: #d7e6f2;
-      --line-strong: #a3c6e4;
+      --line: #dcebf8;
+      --line-strong: #a5c9e8;
       --mono: 'IBM Plex Mono', ui-monospace, monospace;
       --sans: 'Space Grotesk', -apple-system, sans-serif;
       --serif: 'Instrument Serif', Georgia, serif;
@@ -250,7 +250,7 @@
   const DAY = 86400000;
 
   Chart.defaults.color = "#8a7264";
-  Chart.defaults.borderColor = "#d7e6f2";
+  Chart.defaults.borderColor = "#dcebf8";
   Chart.defaults.font.family = "'IBM Plex Mono', monospace";
   Chart.defaults.font.size = 10;
 
@@ -436,7 +436,7 @@
           tooltip: { callbacks: { label: x => x.dataset.label + ": " + fmtMoney(x.parsed.y) } }
         },
         scales: {
-          y: { ticks: { callback: v => fmtMoney(v) }, grid: { color: "#d7e6f2" } },
+          y: { ticks: { callback: v => fmtMoney(v) }, grid: { color: "#dcebf8" } },
           x: { grid: { display: false }, ticks: { maxTicksLimit: 14 } }
         }
       }

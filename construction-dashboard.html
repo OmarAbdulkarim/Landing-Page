@@ -13,9 +13,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
-      --paper: #f9f6f0;
-      --paper-raise: #e7f1f8;
-      --panel: #dcebf7;
+      --paper: #ffffff;
+      --paper-raise: #e9f4fc;
+      --panel: #ddedf9;
       --ink: #3d2c21;
       --muted: #8a7264;
       --accent: #0284c7;
@@ -23,8 +23,8 @@
       --amber: #c07f10;
       --red: #d64545;
       --blue: #3b82c4;
-      --line: #d7e6f2;
-      --line-strong: #a3c6e4;
+      --line: #dcebf8;
+      --line-strong: #a5c9e8;
       --mono: 'IBM Plex Mono', ui-monospace, monospace;
       --sans: 'Space Grotesk', -apple-system, sans-serif;
       --serif: 'Instrument Serif', Georgia, serif;
@@ -658,7 +658,7 @@
   const COLORS = {
     ink: "#3d2c21", muted: "#8a7264", accent: "#0284c7",
     green: "#2e9e66", amber: "#c07f10", red: "#d64545",
-    blue: "#3b82c4", line: "#d7e6f2", strong: "#a3c6e4"
+    blue: "#3b82c4", line: "#dcebf8", strong: "#a5c9e8"
   };
 
   Chart.defaults.color = COLORS.muted;
@@ -994,7 +994,7 @@
       type: "doughnut",
       data: {
         labels: order,
-        datasets: [{ data: counts, backgroundColor: colors, borderColor: "#f9f6f0", borderWidth: 2 }]
+        datasets: [{ data: counts, backgroundColor: colors, borderColor: "#ffffff", borderWidth: 2 }]
       },
       options: {
         responsive: true, maintainAspectRatio: false, cutout: "68%",
