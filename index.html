@@ -252,10 +252,14 @@
     h1 .row { display: block; }
     h1 .indent { padding-left: clamp(40px, 10vw, 160px); }
 
+    /* hero accent words match the headline font — only the color differs */
     h1 em.serif {
-      text-transform: none;
-      letter-spacing: -0.02em;
-      font-size: 0.95em;
+      font-family: var(--sans);
+      font-style: normal;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: -0.04em;
+      font-size: 1em;
     }
 
     .hero-foot {
@@ -864,10 +868,23 @@
     .email-link:hover::after { right: 0; }
 
     /* ============ PROFILE CARD (ported from React Bits <ProfileCard/>) ============ */
+    .viz-flex {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .viz-flex .viz-frame { flex: 1; min-width: 0; }
+
     .profile-card-row {
       display: flex;
       justify-content: center;
-      margin-bottom: 72px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 820px) {
+      .viz-flex { flex-direction: column; }
+      .viz-flex .viz-frame { width: 100%; }
     }
 
     .pc-card-wrapper {
@@ -904,8 +921,8 @@
     }
 
     .pc-card {
-      height: 80svh;
-      max-height: 540px;
+      height: 48svh;
+      max-height: 380px;
       display: grid;
       aspect-ratio: 0.718;
       border-radius: var(--card-radius);
@@ -1263,7 +1280,7 @@
     }
 
     @media (max-width: 768px) {
-      .pc-card { height: 70svh; max-height: 450px; }
+      .pc-card { height: 46svh; max-height: 340px; }
       .pc-details { top: 2em; }
       .pc-details h3 { font-size: min(4svh, 2.5em); }
       .pc-details p { font-size: 14px; }
@@ -1276,7 +1293,7 @@
     }
 
     @media (max-width: 480px) {
-      .pc-card { height: 60svh; max-height: 380px; }
+      .pc-card { height: 44svh; max-height: 300px; }
       .pc-details { top: 1.5em; }
       .pc-details h3 { font-size: min(3.5svh, 2em); }
       .pc-details p { font-size: 12px; top: -8px; }
@@ -1625,20 +1642,21 @@
           <span class="lbl">Tools built &amp; in service</span>
         </div>
         <div class="stat reveal">
-          <span class="num">30M+</span>
+          <span class="num" data-count-claims>30M+</span>
           <span class="lbl">AED in approved delay claims</span>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="viz-sec" aria-hidden="true">
+  <section class="viz-sec">
     <div class="wrap">
-      <div class="viz-head">
+      <div class="viz-head" aria-hidden="true">
         <span>// the work — a program building itself</span>
         <span class="live">● live · looping</span>
       </div>
-      <div class="viz-frame">
+      <div class="viz-flex">
+      <div class="viz-frame" aria-hidden="true">
         <svg viewBox="0 0 1200 440" xmlns="http://www.w3.org/2000/svg" role="img">
           <!-- background grid -->
           <g stroke="#241b38" stroke-width="1" opacity="0.45">
@@ -1736,11 +1754,6 @@
           </g>
         </svg>
       </div>
-    </div>
-  </section>
-
-  <section id="contact">
-    <div class="wrap">
       <div class="profile-card-row">
         <div class="pc-card-wrapper">
           <div class="pc-card-shell">
@@ -1776,6 +1789,12 @@
           </div>
         </div>
       </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
       <p class="contact-kicker">Contact — open for inquiries</p>
       <a class="email-link" href="mailto:omabdulkarim6@gmail.com">omabdulkarim6@gmail.com</a>
     </div>
@@ -2039,8 +2058,46 @@
     // Counters
     document.getElementById("proj-count").textContent =
       String(projects.length).padStart(2, "0") + " entries on file";
-    document.querySelector("[data-count]").textContent =
-      String(projects.length).padStart(2, "0");
+
+    // COUNT UP — vanilla port of React Bits <CountUp/>
+    // (same spring physics as motion's useSpring, no dependency)
+    function countUp(el, from, to, duration, format) {
+      if (!el) return;
+      el.textContent = format(from);
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        el.textContent = format(to);
+        return;
+      }
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          if (!en.isIntersecting) return;
+          io.disconnect();
+          const damping = 20 + 40 / duration;
+          const stiffness = 100 / duration;
+          let pos = from, vel = 0, last = null;
+          function frame(ts) {
+            if (last === null) last = ts;
+            const dt = Math.min((ts - last) / 1000, 0.064);
+            last = ts;
+            vel += (-stiffness * (pos - to) - damping * vel) * dt;
+            pos += vel * dt;
+            if (Math.abs(pos - to) < 0.005 && Math.abs(vel) < 0.01) {
+              el.textContent = format(to);
+              return;
+            }
+            el.textContent = format(pos);
+            requestAnimationFrame(frame);
+          }
+          requestAnimationFrame(frame);
+        });
+      }, { threshold: 0.5 });
+      io.observe(el);
+    }
+
+    countUp(document.querySelector("[data-count]"), 0, projects.length, 2,
+      v => String(Math.round(v)).padStart(2, "0"));
+    countUp(document.querySelector("[data-count-claims]"), 0, 30, 2,
+      v => Math.round(v) + "M+");
     document.getElementById("year").textContent = new Date().getFullYear();
 
     // Duplicate ticker content for seamless loop
@@ -2408,7 +2465,7 @@
         fadeDistance: 1.6,
         vignetteStrength: 8,   // high strength = thin dark rim only, sides stay lit
         glowIntensity: 0.15,
-        opacity: 0.6,
+        opacity: 0.12,
         gridRotation: 0,
         mouseInteraction: true,
         mouseInteractionRadius: 1.9
@@ -2491,9 +2548,8 @@ void main() {
         color += glowIntensity * exp(-gridThickness * 0.5 * smoothB.y);
     }
 
-    // two side columns: center band fully clear, outer bands fully visible
-    float cx = abs(vUv.x - 0.5);
-    float ddd = smoothstep(0.2, 0.32, cx);
+    // uniform grid across the screen, gently fading out toward the far edges
+    float ddd = 1.0 - smoothstep(0.3, 0.65, length(vUv - 0.5));
 
     vec3 t;
     if (enableRainbow) {
