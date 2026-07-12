@@ -680,6 +680,19 @@
 
     .ai-card:hover { border-color: var(--accent); transform: translateY(-3px); }
 
+    .ai-img {
+      display: block;
+      width: calc(100% + 52px);
+      margin: -26px -26px 20px;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-bottom: 1px solid var(--line);
+      filter: saturate(0.85);
+      transition: filter 0.25s;
+    }
+
+    .ai-card:hover .ai-img { filter: saturate(1); }
+
     .ai-tag {
       font-family: var(--mono);
       font-size: 11px;
@@ -1437,6 +1450,7 @@
 
       <div class="ai-grid">
         <div class="ai-card reveal">
+          <img class="ai-img" src="ai-claims.jpg" alt="AI assistant drafting a construction claim on a tablet, cranes in the background" loading="lazy">
           <span class="ai-tag">AI / 01</span>
           <h3>Claims &amp; correspondence drafting</h3>
           <p class="ai-io">
@@ -1446,6 +1460,7 @@
           <p class="note">Days of drafting become hours. The analysis stays human — every fact is verified against the program.</p>
         </div>
         <div class="ai-card reveal">
+          <img class="ai-img" src="ai-code.jpg" alt="Holographic code editor beside a robotic arm 3D-printing a concrete component" loading="lazy">
           <span class="ai-tag">AI / 02</span>
           <h3>Code on demand</h3>
           <p class="ai-io">
@@ -1455,6 +1470,7 @@
           <p class="note">How the tools on this page got built at speed — spec the problem clearly, iterate on working code.</p>
         </div>
         <div class="ai-card reveal">
+          <img class="ai-img" src="ai-narratives.jpg" alt="Project data flowing into an auto-generated narrative report with charts" loading="lazy">
           <span class="ai-tag">AI / 03</span>
           <h3>Program narratives</h3>
           <p class="ai-io">
@@ -1464,6 +1480,7 @@
           <p class="note">The weekly report drafts itself from the numbers. The analyst edits, adds context, owns the conclusion.</p>
         </div>
         <div class="ai-card reveal">
+          <img class="ai-img" src="ai-team.jpg" alt="Construction team on site reviewing AI dashboards around a rugged tablet" loading="lazy">
           <span class="ai-tag">AI / 04</span>
           <h3>Team enablement</h3>
           <p class="ai-io">
