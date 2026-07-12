@@ -456,8 +456,8 @@
     /* ================= DISCIPLINES ================= */
     .skills-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 26px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
     }
 
     /* ============ ELECTRIC BORDER (ported from React Bits <ElectricBorder/>) ============ */
@@ -502,20 +502,20 @@
     }
 
     .eb-glow-1 {
-      border: 2px solid color-mix(in srgb, var(--electric-border-color) 60%, transparent);
+      border: 1px solid color-mix(in srgb, var(--electric-border-color) 40%, transparent);
       filter: blur(1px);
     }
 
     .eb-glow-2 {
-      border: 2px solid var(--electric-light-color);
-      filter: blur(4px);
+      border: 1px solid color-mix(in srgb, var(--electric-light-color) 70%, transparent);
+      filter: blur(3px);
     }
 
     .eb-background-glow {
       z-index: -1;
-      transform: scale(1.08);
-      filter: blur(32px);
-      opacity: 0.22;
+      transform: scale(1.05);
+      filter: blur(30px);
+      opacity: 0.1;
       background: linear-gradient(-30deg, var(--electric-light-color), transparent, var(--electric-border-color));
     }
 
@@ -525,9 +525,9 @@
       z-index: 1;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       height: 100%;
-      padding: 30px 28px;
+      padding: 22px 20px;
       box-sizing: border-box;
     }
 
@@ -547,16 +547,17 @@
     .electric-card:hover .disc-num { color: var(--accent); }
 
     .disc-name {
-      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      font-size: clamp(1.05rem, 1.5vw, 1.35rem);
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: -0.02em;
+      line-height: 1.12;
     }
 
     .disc-desc {
       color: var(--muted);
-      font-size: 0.92rem;
-      max-width: 480px;
+      font-size: 0.82rem;
+      line-height: 1.5;
     }
 
     .disc-arrow {
@@ -1091,6 +1092,10 @@
     .reveal.visible { opacity: 1; transform: none; }
 
     /* ================= RESPONSIVE ================= */
+    @media (max-width: 1000px) and (min-width: 821px) {
+      .skills-grid { grid-template-columns: 1fr 1fr; }
+    }
+
     @media (max-width: 820px) {
       .nav-links a { padding: 0 12px; }
       .hero-meta { display: none; }
@@ -1932,7 +1937,7 @@
       const cards = Array.from(document.querySelectorAll(".electric-card"));
       if (!cards.length) return;
 
-      const SPEED = 0.8, CHAOS = 0.09, BORDER_RADIUS = 14;
+      const SPEED = 0.8, CHAOS = 0.055, BORDER_RADIUS = 14;
       const OCTAVES = 10, LACUNARITY = 1.6, GAIN = 0.7, FREQUENCY = 10;
       const DISPLACEMENT = 60, BORDER_OFFSET = 60;
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2016,7 +2021,8 @@
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
           ctx.clearRect(0, 0, width, height);
           ctx.strokeStyle = color;
-          ctx.lineWidth = 1.2;
+          ctx.globalAlpha = 0.7;
+          ctx.lineWidth = 1;
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
 
@@ -2490,8 +2496,8 @@ void main() {
         gridThickness: 28,
         fadeDistance: 1.6,
         vignetteStrength: 8,   // high strength = thin dark rim only, sides stay lit
-        glowIntensity: 0.15,
-        opacity: 0.12,
+        glowIntensity: 0.2,
+        opacity: 0.26,
         gridRotation: 0,
         mouseInteraction: true,
         mouseInteractionRadius: 1.9
