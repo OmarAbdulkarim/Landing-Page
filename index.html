@@ -527,7 +527,8 @@
       flex-direction: column;
       gap: 12px;
       height: 100%;
-      padding: 22px 20px;
+      min-height: 440px;
+      padding: 26px 22px;
       box-sizing: border-box;
     }
 
@@ -2481,26 +2482,29 @@ void main() {
     })();
 
     // ============================================================
-    // RIPPLE GRID — vanilla WebGL port of React Bits <RippleGrid/>
+    // SOFT AURORA — vanilla WebGL port of React Bits <SoftAurora/>
     // (raw WebGL fullscreen triangle instead of the ogl dependency)
+    // fills the fixed background layer behind everything after the hero
     // ============================================================
     (function () {
       const container = document.querySelector(".ripple-grid-bg");
       if (!container) return;
 
       const opts = {
-        enableRainbow: false,
-        gridColor: "#8b5cf6",        // theme purple
-        rippleIntensity: 0.05,
-        gridSize: 17,   // ~30% smaller squares
-        gridThickness: 28,
-        fadeDistance: 1.6,
-        vignetteStrength: 8,   // high strength = thin dark rim only, sides stay lit
-        glowIntensity: 0.2,
-        opacity: 0.26,
-        gridRotation: 0,
-        mouseInteraction: true,
-        mouseInteractionRadius: 1.9
+        speed: 0.5,
+        scale: 1.1,
+        brightness: 0.8,     // keep colors in the blue/purple range, no white blowout
+        color1: "#38bdf8",   // accent blue
+        color2: "#8b5cf6",   // theme purple
+        noiseFrequency: 2.0,
+        noiseAmplitude: 1.0,
+        bandHeight: 0.5,
+        bandSpread: 0.8,     // tighter ribbon so text stays readable
+        octaveDecay: 0.1,
+        layerOffset: 0.05,
+        colorSpeed: 1.0,
+        enableMouse: true,
+        mouseInfluence: 0.25
       };
 
       const canvas = document.createElement("canvas");
@@ -2508,95 +2512,128 @@ void main() {
       const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false });
       if (!gl) { container.remove(); return; }
 
-      const vert = "attribute vec2 position; varying vec2 vUv;" +
-        "void main() { vUv = position * 0.5 + 0.5; gl_Position = vec4(position, 0.0, 1.0); }";
+      const vert = "attribute vec2 position;" +
+        "void main() { gl_Position = vec4(position, 0.0, 1.0); }";
 
       const frag = `precision highp float;
-uniform float iTime;
-uniform vec2 iResolution;
-uniform bool enableRainbow;
-uniform vec3 gridColor;
-uniform float rippleIntensity;
-uniform float gridSize;
-uniform float gridThickness;
-uniform float fadeDistance;
-uniform float vignetteStrength;
-uniform float glowIntensity;
-uniform float opacity;
-uniform float gridRotation;
-uniform bool mouseInteraction;
-uniform vec2 mousePosition;
-uniform float mouseInfluence;
-uniform float mouseInteractionRadius;
-varying vec2 vUv;
 
-float pi = 3.141592;
+uniform float uTime;
+uniform vec3 uResolution;
+uniform float uSpeed;
+uniform float uScale;
+uniform float uBrightness;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+uniform float uNoiseFreq;
+uniform float uNoiseAmp;
+uniform float uBandHeight;
+uniform float uBandSpread;
+uniform float uOctaveDecay;
+uniform float uLayerOffset;
+uniform float uColorSpeed;
+uniform vec2 uMouse;
+uniform float uMouseInfluence;
+uniform bool uEnableMouse;
 
-mat2 rotate(float angle) {
-    float s = sin(angle);
-    float c = cos(angle);
-    return mat2(c, -s, s, c);
+#define TAU 6.28318
+
+vec3 gradientHash(vec3 p) {
+  p = vec3(
+    dot(p, vec3(127.1, 311.7, 234.6)),
+    dot(p, vec3(269.5, 183.3, 198.3)),
+    dot(p, vec3(169.5, 283.3, 156.9))
+  );
+  vec3 h = fract(sin(p) * 43758.5453123);
+  float phi = acos(2.0 * h.x - 1.0);
+  float theta = TAU * h.y;
+  return vec3(cos(theta) * sin(phi), sin(theta) * cos(phi), cos(phi));
+}
+
+float quinticSmooth(float t) {
+  float t2 = t * t;
+  float t3 = t * t2;
+  return 6.0 * t3 * t2 - 15.0 * t2 * t2 + 10.0 * t3;
+}
+
+vec3 cosineGradient(float t, vec3 a, vec3 b, vec3 c, vec3 d) {
+  return a + b * cos(TAU * (c * t + d));
+}
+
+float perlin3D(float amplitude, float frequency, float px, float py, float pz) {
+  float x = px * frequency;
+  float y = py * frequency;
+
+  float fx = floor(x); float fy = floor(y); float fz = floor(pz);
+  float cx = ceil(x);  float cy = ceil(y);  float cz = ceil(pz);
+
+  vec3 g000 = gradientHash(vec3(fx, fy, fz));
+  vec3 g100 = gradientHash(vec3(cx, fy, fz));
+  vec3 g010 = gradientHash(vec3(fx, cy, fz));
+  vec3 g110 = gradientHash(vec3(cx, cy, fz));
+  vec3 g001 = gradientHash(vec3(fx, fy, cz));
+  vec3 g101 = gradientHash(vec3(cx, fy, cz));
+  vec3 g011 = gradientHash(vec3(fx, cy, cz));
+  vec3 g111 = gradientHash(vec3(cx, cy, cz));
+
+  float d000 = dot(g000, vec3(x - fx, y - fy, pz - fz));
+  float d100 = dot(g100, vec3(x - cx, y - fy, pz - fz));
+  float d010 = dot(g010, vec3(x - fx, y - cy, pz - fz));
+  float d110 = dot(g110, vec3(x - cx, y - cy, pz - fz));
+  float d001 = dot(g001, vec3(x - fx, y - fy, pz - cz));
+  float d101 = dot(g101, vec3(x - cx, y - fy, pz - cz));
+  float d011 = dot(g011, vec3(x - fx, y - cy, pz - cz));
+  float d111 = dot(g111, vec3(x - cx, y - cy, pz - cz));
+
+  float sx = quinticSmooth(x - fx);
+  float sy = quinticSmooth(y - fy);
+  float sz = quinticSmooth(pz - fz);
+
+  float lx00 = mix(d000, d100, sx);
+  float lx10 = mix(d010, d110, sx);
+  float lx01 = mix(d001, d101, sx);
+  float lx11 = mix(d011, d111, sx);
+
+  float ly0 = mix(lx00, lx10, sy);
+  float ly1 = mix(lx01, lx11, sy);
+
+  return amplitude * mix(ly0, ly1, sz);
+}
+
+float auroraGlow(float t, vec2 shift) {
+  vec2 uv = gl_FragCoord.xy / uResolution.y;
+  uv += shift;
+
+  float noiseVal = 0.0;
+  float freq = uNoiseFreq;
+  float amp = uNoiseAmp;
+  vec2 samplePos = uv * uScale;
+
+  for (float i = 0.0; i < 3.0; i += 1.0) {
+    noiseVal += perlin3D(amp, freq, samplePos.x, samplePos.y, t);
+    amp *= uOctaveDecay;
+    freq *= 2.0;
+  }
+
+  float yBand = uv.y * 10.0 - uBandHeight * 10.0;
+  return 0.3 * max(exp(uBandSpread * (1.0 - 1.1 * abs(noiseVal + yBand))), 0.0);
 }
 
 void main() {
-    vec2 uv = vUv * 2.0 - 1.0;
-    uv.x *= iResolution.x / iResolution.y;
+  vec2 uv = gl_FragCoord.xy / uResolution.xy;
+  float t = uSpeed * 0.4 * uTime;
 
-    if (gridRotation != 0.0) {
-        uv = rotate(gridRotation * pi / 180.0) * uv;
-    }
+  vec2 shift = vec2(0.0);
+  if (uEnableMouse) {
+    shift = (uMouse - 0.5) * uMouseInfluence;
+  }
 
-    // static grid — only the mouse interaction ripples it
-    vec2 rippleUv = uv;
+  vec3 col = vec3(0.0);
+  col += 0.99 * auroraGlow(t, shift) * cosineGradient(uv.x + uTime * uSpeed * 0.2 * uColorSpeed, vec3(0.5), vec3(0.5), vec3(1.0), vec3(0.3, 0.20, 0.20)) * uColor1;
+  col += 0.99 * auroraGlow(t + uLayerOffset, shift) * cosineGradient(uv.x + uTime * uSpeed * 0.1 * uColorSpeed, vec3(0.5), vec3(0.5), vec3(2.0, 1.0, 0.0), vec3(0.5, 0.20, 0.25)) * uColor2;
 
-    if (mouseInteraction && mouseInfluence > 0.0) {
-        vec2 mouseUv = (mousePosition * 2.0 - 1.0);
-        mouseUv.x *= iResolution.x / iResolution.y;
-        float mouseDist = length(uv - mouseUv);
-
-        float influence = mouseInfluence * exp(-mouseDist * mouseDist / (mouseInteractionRadius * mouseInteractionRadius));
-
-        float mouseWave = sin(pi * (iTime * 2.0 - mouseDist * 3.0)) * influence;
-        rippleUv += normalize(uv - mouseUv) * mouseWave * rippleIntensity * 0.3;
-    }
-
-    vec2 a = sin(gridSize * 0.5 * pi * rippleUv - pi / 2.0);
-    vec2 b = abs(a);
-
-    float aaWidth = 0.5;
-    vec2 smoothB = vec2(
-        smoothstep(0.0, aaWidth, b.x),
-        smoothstep(0.0, aaWidth, b.y)
-    );
-
-    vec3 color = vec3(0.0);
-    color += exp(-gridThickness * smoothB.x * 0.8);
-    color += exp(-gridThickness * smoothB.y);
-    color += 0.5 * exp(-(gridThickness / 4.0) * sin(smoothB.x));
-    color += 0.5 * exp(-(gridThickness / 3.0) * smoothB.y);
-
-    if (glowIntensity > 0.0) {
-        color += glowIntensity * exp(-gridThickness * 0.5 * smoothB.x);
-        color += glowIntensity * exp(-gridThickness * 0.5 * smoothB.y);
-    }
-
-    // uniform grid across the screen, gently fading out toward the far edges
-    float ddd = 1.0 - smoothstep(0.3, 0.65, length(vUv - 0.5));
-
-    vec3 t;
-    if (enableRainbow) {
-        t = vec3(
-            uv.x * 0.5 + 0.5 * sin(iTime),
-            uv.y * 0.5 + 0.5 * cos(iTime),
-            pow(cos(iTime), 4.0)
-        ) + 0.5;
-    } else {
-        t = gridColor;
-    }
-
-    float finalFade = ddd;
-    float alpha = length(color) * finalFade * opacity;
-    gl_FragColor = vec4(color * t * finalFade * opacity, alpha);
+  col *= uBrightness;
+  float alpha = clamp(length(col), 0.0, 1.0);
+  gl_FragColor = vec4(col, alpha);
 }`;
 
       function compile(type, src) {
@@ -2604,7 +2641,7 @@ void main() {
         gl.shaderSource(s, src);
         gl.compileShader(s);
         if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-          console.error("RippleGrid shader error:", gl.getShaderInfoLog(s));
+          console.error("SoftAurora shader error:", gl.getShaderInfoLog(s));
           return null;
         }
         return s;
@@ -2632,30 +2669,31 @@ void main() {
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
       const U = {};
-      ["iTime", "iResolution", "enableRainbow", "gridColor", "rippleIntensity", "gridSize",
-       "gridThickness", "fadeDistance", "vignetteStrength", "glowIntensity", "opacity",
-       "gridRotation", "mouseInteraction", "mousePosition", "mouseInfluence",
-       "mouseInteractionRadius"].forEach(n => { U[n] = gl.getUniformLocation(prog, n); });
+      ["uTime", "uResolution", "uSpeed", "uScale", "uBrightness", "uColor1", "uColor2",
+       "uNoiseFreq", "uNoiseAmp", "uBandHeight", "uBandSpread", "uOctaveDecay",
+       "uLayerOffset", "uColorSpeed", "uMouse", "uMouseInfluence", "uEnableMouse"
+      ].forEach(n => { U[n] = gl.getUniformLocation(prog, n); });
 
       function hexToRgb(hex) {
         const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return m ? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255] : [1, 1, 1];
       }
 
-      gl.uniform1i(U.enableRainbow, opts.enableRainbow ? 1 : 0);
-      gl.uniform3fv(U.gridColor, hexToRgb(opts.gridColor));
-      gl.uniform1f(U.rippleIntensity, opts.rippleIntensity);
-      gl.uniform1f(U.gridSize, opts.gridSize);
-      gl.uniform1f(U.gridThickness, opts.gridThickness);
-      gl.uniform1f(U.fadeDistance, opts.fadeDistance);
-      gl.uniform1f(U.vignetteStrength, opts.vignetteStrength);
-      gl.uniform1f(U.glowIntensity, opts.glowIntensity);
-      gl.uniform1f(U.opacity, opts.opacity);
-      gl.uniform1f(U.gridRotation, opts.gridRotation);
-      gl.uniform1i(U.mouseInteraction, opts.mouseInteraction ? 1 : 0);
-      gl.uniform2f(U.mousePosition, 0.5, 0.5);
-      gl.uniform1f(U.mouseInfluence, 0);
-      gl.uniform1f(U.mouseInteractionRadius, opts.mouseInteractionRadius);
+      gl.uniform1f(U.uSpeed, opts.speed);
+      gl.uniform1f(U.uScale, opts.scale);
+      gl.uniform1f(U.uBrightness, opts.brightness);
+      gl.uniform3fv(U.uColor1, hexToRgb(opts.color1));
+      gl.uniform3fv(U.uColor2, hexToRgb(opts.color2));
+      gl.uniform1f(U.uNoiseFreq, opts.noiseFrequency);
+      gl.uniform1f(U.uNoiseAmp, opts.noiseAmplitude);
+      gl.uniform1f(U.uBandHeight, opts.bandHeight);
+      gl.uniform1f(U.uBandSpread, opts.bandSpread);
+      gl.uniform1f(U.uOctaveDecay, opts.octaveDecay);
+      gl.uniform1f(U.uLayerOffset, opts.layerOffset);
+      gl.uniform1f(U.uColorSpeed, opts.colorSpeed);
+      gl.uniform2f(U.uMouse, 0.5, 0.5);
+      gl.uniform1f(U.uMouseInfluence, opts.mouseInfluence);
+      gl.uniform1i(U.uEnableMouse, opts.enableMouse ? 1 : 0);
 
       function resize() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -2663,63 +2701,54 @@ void main() {
         canvas.width = w * dpr;
         canvas.height = h * dpr;
         gl.viewport(0, 0, canvas.width, canvas.height);
-        gl.uniform2f(U.iResolution, w, h);
+        gl.uniform3f(U.uResolution, canvas.width, canvas.height, canvas.width / canvas.height);
       }
       window.addEventListener("resize", resize);
       resize();
-      // re-measure when the container gets its real size (e.g. load in a hidden tab)
       if (window.ResizeObserver) {
-        new ResizeObserver(() => { resize(); draw(performance.now()); }).observe(container);
+        new ResizeObserver(resize).observe(container);
       }
 
       const mouse = { x: 0.5, y: 0.5 };
       const targetMouse = { x: 0.5, y: 0.5 };
-      let influence = 0, targetInfluence = 0;
-      let animating = false;
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      if (opts.mouseInteraction && !reduceMotion) {
+      if (opts.enableMouse && !reduceMotion) {
         // the layer is fixed and pointer-events:none, so track the whole document
         document.addEventListener("mousemove", e => {
           targetMouse.x = e.clientX / window.innerWidth;
           targetMouse.y = 1 - e.clientY / window.innerHeight;
-          targetInfluence = 1;
-          wake();
         });
-        document.documentElement.addEventListener("mouseleave", () => { targetInfluence = 0; });
+        document.documentElement.addEventListener("mouseleave", () => {
+          targetMouse.x = 0.5; targetMouse.y = 0.5;
+        });
       }
 
       function draw(t) {
-        gl.uniform1f(U.iTime, t * 0.001);
-        mouse.x += (targetMouse.x - mouse.x) * 0.1;
-        mouse.y += (targetMouse.y - mouse.y) * 0.1;
-        influence += (targetInfluence - influence) * 0.05;
-        gl.uniform2f(U.mousePosition, mouse.x, mouse.y);
-        gl.uniform1f(U.mouseInfluence, influence);
+        gl.uniform1f(U.uTime, t * 0.001);
+        mouse.x += (targetMouse.x - mouse.x) * 0.05;
+        mouse.y += (targetMouse.y - mouse.y) * 0.05;
+        gl.uniform2f(U.uMouse, mouse.x, mouse.y);
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       }
 
-      // static grid by default — animate only while the mouse ripple is active
-      function tick() {
-        draw(performance.now());
-        if (targetInfluence === 0 && influence < 0.004) {
-          influence = 0;
-          animating = false;
-          return;
-        }
-        requestAnimationFrame(tick);
-      }
+      let rafId = null;
+      function loop(t) { draw(t); rafId = requestAnimationFrame(loop); }
+      function startAurora() { if (rafId === null) rafId = requestAnimationFrame(loop); }
+      function stopAurora() { if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; } }
 
-      function wake() {
-        if (!animating) {
-          animating = true;
-          requestAnimationFrame(tick);
-        }
-      }
+      // pause when the tab is hidden to save the GPU
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stopAurora(); else if (!reduceMotion) startAurora();
+      });
 
-      draw(0);
+      if (reduceMotion) {
+        draw(3000); // single calm static frame
+      } else {
+        startAurora();
+      }
     })();
   </script>
 </body>
