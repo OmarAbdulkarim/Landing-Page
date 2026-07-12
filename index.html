@@ -275,6 +275,7 @@
       max-width: 460px;
       color: var(--muted);
       font-size: 1rem;
+      margin: -16px 0 40px;
     }
 
     .hero-cta {
@@ -1067,89 +1068,6 @@
       pointer-events: none;
     }
 
-    .pc-user-info {
-      position: absolute;
-      --ui-inset: 20px;
-      --ui-radius-bias: 6px;
-      bottom: var(--ui-inset);
-      left: var(--ui-inset);
-      right: var(--ui-inset);
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(30px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: calc(max(0px, var(--card-radius) - var(--ui-inset) + var(--ui-radius-bias)));
-      padding: 12px 14px;
-      pointer-events: auto;
-    }
-
-    .pc-user-details {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .pc-mini-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      flex-shrink: 0;
-    }
-
-    .pc-mini-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-
-    .pc-user-text {
-      display: flex;
-      align-items: flex-start;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .pc-handle {
-      font-size: 14px;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.9);
-      line-height: 1;
-      text-align: left;
-    }
-
-    .pc-status {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1;
-      text-align: left;
-    }
-
-    .pc-contact-btn {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 12px;
-      font-weight: 600;
-      font-family: inherit;
-      background: transparent;
-      color: rgba(255, 255, 255, 0.9);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(10px);
-    }
-
-    .pc-contact-btn:hover {
-      border-color: rgba(255, 255, 255, 0.4);
-      transform: translateY(-1px);
-      transition: all 0.2s ease;
-    }
-
     .pc-content:not(.pc-avatar-content) {
       max-height: 100%;
       overflow: hidden;
@@ -1218,12 +1136,6 @@
       .pc-details { top: 2em; }
       .pc-details h3 { font-size: min(4svh, 2.5em); }
       .pc-details p { font-size: 14px; }
-      .pc-user-info { --ui-inset: 15px; padding: 10px 12px; }
-      .pc-mini-avatar { width: 28px; height: 28px; }
-      .pc-user-details { gap: 10px; }
-      .pc-handle { font-size: 13px; }
-      .pc-status { font-size: 10px; }
-      .pc-contact-btn { padding: 6px 12px; font-size: 11px; }
     }
 
     @media (max-width: 480px) {
@@ -1231,12 +1143,6 @@
       .pc-details { top: 1.5em; }
       .pc-details h3 { font-size: min(3.5svh, 2em); }
       .pc-details p { font-size: 12px; top: -8px; }
-      .pc-user-info { --ui-inset: 12px; padding: 8px 10px; }
-      .pc-mini-avatar { width: 24px; height: 24px; }
-      .pc-user-details { gap: 8px; }
-      .pc-handle { font-size: 12px; }
-      .pc-status { font-size: 9px; }
-      .pc-contact-btn { padding: 5px 10px; font-size: 10px; border-radius: 50px; }
     }
 
     /* ================= FOOTER ================= */
@@ -1383,13 +1289,14 @@
     <div id="coords">X:0000 Y:0000</div>
 
     <div class="wrap hero-body">
-      <p class="hero-kicker">Project controls &amp; data analysis — built in the field</p>
+      <p class="hero-kicker">Data, AI &amp; automation — built for construction</p>
       <h1>
-        <span class="row">Plans that</span>
-        <span class="row indent"><em class="serif">hold.</em> Claims that</span>
-        <span class="row"><em class="serif">land.</em> Data that</span>
-        <span class="row indent"><em class="serif">decides.</em></span>
+        <span class="row">Systems that</span>
+        <span class="row indent"><em class="serif">connect.</em> Data that</span>
+        <span class="row"><em class="serif">decides.</em> AI that</span>
+        <span class="row indent"><em class="serif">delivers.</em></span>
       </h1>
+      <p class="hero-sub">I help construction utilize data, AI, and automation to connect systems and minimize manual work.</p>
       <div class="hero-foot">
         <a class="hero-cta" href="#projects">Open the index ↓</a>
         <div class="id-block">
@@ -1703,19 +1610,6 @@
                 <div class="pc-content pc-avatar-content">
                   <img class="avatar" src="omar.jpg" alt="Omar Abdulkarim avatar" loading="lazy"
                        onerror="this.style.display='none'">
-                  <div class="pc-user-info">
-                    <div class="pc-user-details">
-                      <div class="pc-mini-avatar">
-                        <img src="omar.jpg" alt="Omar Abdulkarim mini avatar" loading="lazy">
-                      </div>
-                      <div class="pc-user-text">
-                        <div class="pc-handle">@OmarAbdulkarim</div>
-                        <div class="pc-status">Open for inquiries</div>
-                      </div>
-                    </div>
-                    <button class="pc-contact-btn" type="button" aria-label="Contact Omar Abdulkarim"
-                            style="pointer-events: auto">Contact Me</button>
-                  </div>
                 </div>
                 <div class="pc-content">
                   <div class="pc-details">
@@ -2343,11 +2237,6 @@
       const wrap = document.querySelector(".pc-card-wrapper");
       if (!wrap) return;
       const shell = wrap.querySelector(".pc-card-shell");
-
-      const contactBtn = wrap.querySelector(".pc-contact-btn");
-      if (contactBtn) contactBtn.addEventListener("click", () => {
-        window.location.href = "mailto:omabdulkarim6@gmail.com";
-      });
 
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
