@@ -664,59 +664,116 @@
     .proj-link:hover { color: var(--ink); border-color: var(--ink); }
 
     /* ================= AI SECTION ================= */
-    .ai-grid {
+    .ai-stage {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: 26px;
       margin-bottom: 40px;
+      align-items: stretch;
     }
 
-    .ai-card {
+    .ai-select {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ai-item {
       background: var(--paper-raise);
       border: 1px solid var(--line);
-      padding: 26px;
-      transition: border-color 0.25s, transform 0.25s;
+      transition: border-color 0.25s;
     }
 
-    .ai-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .ai-item.active { border-color: var(--accent); }
 
-    .ai-img {
-      display: block;
-      width: calc(100% + 52px);
-      margin: -26px -26px 20px;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      border-bottom: 1px solid var(--line);
-      filter: saturate(0.85);
-      transition: filter 0.25s;
+    .ai-item-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      padding: 18px 20px;
+      background: none;
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--ink);
+      text-align: left;
     }
-
-    .ai-card:hover .ai-img { filter: saturate(1); }
 
     .ai-tag {
       font-family: var(--mono);
       font-size: 11px;
       color: var(--accent);
       letter-spacing: 0.12em;
-      display: block;
-      margin-bottom: 14px;
+      flex-shrink: 0;
     }
 
-    .ai-card h3 { font-size: 1.08rem; font-weight: 600; margin-bottom: 12px; }
+    .ai-item-title { font-size: 1.02rem; font-weight: 600; }
+
+    .ai-item-arrow {
+      margin-left: auto;
+      font-family: var(--mono);
+      color: var(--muted);
+      transition: transform 0.3s, color 0.25s;
+    }
+
+    .ai-item.active .ai-item-arrow { transform: rotate(90deg); color: var(--accent); }
+
+    .ai-item-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.45s ease;
+    }
+
+    .ai-item.active .ai-item-body { grid-template-rows: 1fr; }
+
+    .ai-item-body-inner { overflow: hidden; padding: 0 20px; }
 
     .ai-io {
       font-family: var(--mono);
       font-size: 11px;
       line-height: 1.9;
       letter-spacing: 0.02em;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .ai-io .in { color: var(--muted); display: block; }
     .ai-io .out { color: var(--ink); display: block; }
     .ai-io b { color: var(--accent); font-weight: 500; }
 
-    .ai-card p.note { color: var(--muted); font-size: 0.88rem; }
+    .ai-item .note { color: var(--muted); font-size: 0.88rem; padding-bottom: 18px; margin: 0; }
+
+    /* ---- visual panel: MagicRings behind the active card's image ---- */
+    .ai-visual {
+      position: relative;
+      border: 1px solid var(--line);
+      background: var(--paper-raise);
+      overflow: hidden;
+      min-height: 440px;
+    }
+
+    .rings-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .ai-visual-img {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(74%, 500px);
+      transform: translate(-50%, -48%) scale(0.95);
+      border: 1px solid var(--line-strong);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      pointer-events: none;
+    }
+
+    .ai-visual-img.active { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
     .ai-cta-row { display: flex; justify-content: flex-start; }
 
@@ -1265,6 +1322,8 @@
       .nav-links a { padding: 0 12px; }
       .hero-meta { display: none; }
       .skills-grid { grid-template-columns: 1fr; }
+      .ai-stage { grid-template-columns: 1fr; }
+      .ai-visual { min-height: 300px; order: -1; }
       .scroll-stack-card { height: auto; min-height: 18rem; padding: 1.5rem; }
       .stack-head .proj-viz { display: none; }
       .stack-desc { -webkit-line-clamp: 6; }
@@ -1448,46 +1507,71 @@
         <p class="sec-note">Learned → Implemented → Training the team</p>
       </div>
 
-      <div class="ai-grid">
-        <div class="ai-card reveal">
-          <img class="ai-img" src="ai-claims.jpg" alt="AI assistant drafting a construction claim on a tablet, cranes in the background" loading="lazy">
-          <span class="ai-tag">AI / 01</span>
-          <h3>Claims &amp; correspondence drafting</h3>
-          <p class="ai-io">
-            <span class="in"><b>IN&nbsp;&nbsp;</b> delay events + window analysis results</span>
-            <span class="out"><b>OUT&nbsp;</b> first-draft EOT narrative</span>
-          </p>
-          <p class="note">Days of drafting become hours. The analysis stays human — every fact is verified against the program.</p>
+      <div class="ai-stage reveal">
+        <div class="ai-select">
+          <div class="ai-item active">
+            <button class="ai-item-head" type="button" aria-expanded="true">
+              <span class="ai-tag">AI / 01</span>
+              <span class="ai-item-title">Claims &amp; correspondence drafting</span>
+              <span class="ai-item-arrow">→</span>
+            </button>
+            <div class="ai-item-body"><div class="ai-item-body-inner">
+              <p class="ai-io">
+                <span class="in"><b>IN&nbsp;&nbsp;</b> delay events + window analysis results</span>
+                <span class="out"><b>OUT&nbsp;</b> first-draft EOT narrative</span>
+              </p>
+              <p class="note">Days of drafting become hours. The analysis stays human — every fact is verified against the program.</p>
+            </div></div>
+          </div>
+          <div class="ai-item">
+            <button class="ai-item-head" type="button" aria-expanded="false">
+              <span class="ai-tag">AI / 02</span>
+              <span class="ai-item-title">Code on demand</span>
+              <span class="ai-item-arrow">→</span>
+            </button>
+            <div class="ai-item-body"><div class="ai-item-body-inner">
+              <p class="ai-io">
+                <span class="in"><b>IN&nbsp;&nbsp;</b> a plain-English tool spec</span>
+                <span class="out"><b>OUT&nbsp;</b> working VBA · Power Query · JS</span>
+              </p>
+              <p class="note">How the tools on this page got built at speed — spec the problem clearly, iterate on working code.</p>
+            </div></div>
+          </div>
+          <div class="ai-item">
+            <button class="ai-item-head" type="button" aria-expanded="false">
+              <span class="ai-tag">AI / 03</span>
+              <span class="ai-item-title">Program narratives</span>
+              <span class="ai-item-arrow">→</span>
+            </button>
+            <div class="ai-item-body"><div class="ai-item-body-inner">
+              <p class="ai-io">
+                <span class="in"><b>IN&nbsp;&nbsp;</b> variance tables + KPI exports</span>
+                <span class="out"><b>OUT&nbsp;</b> management-ready commentary</span>
+              </p>
+              <p class="note">The weekly report drafts itself from the numbers. The analyst edits, adds context, owns the conclusion.</p>
+            </div></div>
+          </div>
+          <div class="ai-item">
+            <button class="ai-item-head" type="button" aria-expanded="false">
+              <span class="ai-tag">AI / 04</span>
+              <span class="ai-item-title">Team enablement</span>
+              <span class="ai-item-arrow">→</span>
+            </button>
+            <div class="ai-item-body"><div class="ai-item-body-inner">
+              <p class="ai-io">
+                <span class="in"><b>IN&nbsp;&nbsp;</b> a planning team + real workflows</span>
+                <span class="out"><b>OUT&nbsp;</b> planners who use AI safely</span>
+              </p>
+              <p class="note">Trained on live work, not theory — with ground rules: verify everything, protect project data, own the output.</p>
+            </div></div>
+          </div>
         </div>
-        <div class="ai-card reveal">
-          <img class="ai-img" src="ai-code.jpg" alt="Holographic code editor beside a robotic arm 3D-printing a concrete component" loading="lazy">
-          <span class="ai-tag">AI / 02</span>
-          <h3>Code on demand</h3>
-          <p class="ai-io">
-            <span class="in"><b>IN&nbsp;&nbsp;</b> a plain-English tool spec</span>
-            <span class="out"><b>OUT&nbsp;</b> working VBA · Power Query · JS</span>
-          </p>
-          <p class="note">How the tools on this page got built at speed — spec the problem clearly, iterate on working code.</p>
-        </div>
-        <div class="ai-card reveal">
-          <img class="ai-img" src="ai-narratives.jpg" alt="Project data flowing into an auto-generated narrative report with charts" loading="lazy">
-          <span class="ai-tag">AI / 03</span>
-          <h3>Program narratives</h3>
-          <p class="ai-io">
-            <span class="in"><b>IN&nbsp;&nbsp;</b> variance tables + KPI exports</span>
-            <span class="out"><b>OUT&nbsp;</b> management-ready commentary</span>
-          </p>
-          <p class="note">The weekly report drafts itself from the numbers. The analyst edits, adds context, owns the conclusion.</p>
-        </div>
-        <div class="ai-card reveal">
-          <img class="ai-img" src="ai-team.jpg" alt="Construction team on site reviewing AI dashboards around a rugged tablet" loading="lazy">
-          <span class="ai-tag">AI / 04</span>
-          <h3>Team enablement</h3>
-          <p class="ai-io">
-            <span class="in"><b>IN&nbsp;&nbsp;</b> a planning team + real workflows</span>
-            <span class="out"><b>OUT&nbsp;</b> planners who use AI safely</span>
-          </p>
-          <p class="note">Trained on live work, not theory — with ground rules: verify everything, protect project data, own the output.</p>
+        <div class="ai-visual">
+          <canvas class="rings-canvas" aria-hidden="true"></canvas>
+          <img class="ai-visual-img active" src="ai-claims.jpg" alt="AI assistant drafting a construction claim on a tablet, cranes in the background" loading="lazy">
+          <img class="ai-visual-img" src="ai-code.jpg" alt="Holographic code editor beside a robotic arm 3D-printing a concrete component" loading="lazy">
+          <img class="ai-visual-img" src="ai-narratives.jpg" alt="Project data flowing into an auto-generated narrative report with charts" loading="lazy">
+          <img class="ai-visual-img" src="ai-team.jpg" alt="Construction team on site reviewing AI dashboards around a rugged tablet" loading="lazy">
         </div>
       </div>
 
@@ -2245,6 +2329,230 @@
         }, { threshold: 0 });
         io.observe(card);
       });
+    })();
+
+    // ============================================================
+    // AI SECTION — selector + MagicRings (vanilla WebGL port of
+    // React Bits <MagicRings/>, no three.js dependency)
+    // ============================================================
+    (function () {
+      const stage = document.querySelector(".ai-stage");
+      if (!stage) return;
+      const visual = stage.querySelector(".ai-visual");
+      const canvas = stage.querySelector(".rings-canvas");
+      const items = Array.from(stage.querySelectorAll(".ai-item"));
+      const imgs = Array.from(stage.querySelectorAll(".ai-visual-img"));
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // ---- item selector / accordion ----
+      let current = 0;
+      let burst = 0; // shared with the rings shader (clickBurst)
+
+      function select(i) {
+        if (i === current) return;
+        current = i;
+        items.forEach((it, j) => {
+          it.classList.toggle("active", j === i);
+          it.querySelector(".ai-item-head").setAttribute("aria-expanded", String(j === i));
+        });
+        imgs.forEach((im, j) => im.classList.toggle("active", j === i));
+        burst = 1;
+      }
+
+      let pauseUntil = 0;
+      items.forEach((it, i) => {
+        it.querySelector(".ai-item-head").addEventListener("click", () => {
+          pauseUntil = performance.now() + 15000;
+          select(i);
+        });
+      });
+
+      let stageVisible = false;
+      let rafId = null, glReady = false;
+      new IntersectionObserver(entries => {
+        stageVisible = entries[0].isIntersecting;
+        if (stageVisible) startRings(); else stopRings();
+      }, { threshold: 0.2 }).observe(stage);
+
+      // gentle auto-rotate, paused on hover and after manual selection
+      if (!reduceMotion) {
+        let hovered = false;
+        stage.addEventListener("mouseenter", () => { hovered = true; });
+        stage.addEventListener("mouseleave", () => { hovered = false; });
+        setInterval(() => {
+          if (!stageVisible || hovered || document.hidden || performance.now() < pauseUntil) return;
+          select((current + 1) % items.length);
+        }, 5000);
+      }
+
+      // ---- magic rings background ----
+      const gl = canvas.getContext("webgl2", { alpha: true }) || canvas.getContext("webgl", { alpha: true });
+      if (!gl) { canvas.style.display = "none"; return; }
+
+      // ported <MagicRings/> props, tuned to the site palette
+      const P = {
+        color: [0x38 / 255, 0xbd / 255, 0xf8 / 255],     // --accent
+        colorTwo: [0x9b / 255, 0x8e / 255, 0xc4 / 255],  // --muted
+        speed: 0.8, ringCount: 6, attenuation: 10, lineThickness: 2,
+        baseRadius: 0.32, radiusStep: 0.11, scaleRate: 0.1,
+        opacity: 0.9, noiseAmount: 0.06, rotation: 0, ringGap: 1.5,
+        fadeIn: 0.7, fadeOut: 0.5, mouseInfluence: 0.12, hoverScale: 1.1, parallax: 0.04
+      };
+
+      const vertSrc = "attribute vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }";
+      const fragSrc = `
+precision highp float;
+
+uniform float uTime, uAttenuation, uLineThickness;
+uniform float uBaseRadius, uRadiusStep, uScaleRate;
+uniform float uOpacity, uNoiseAmount, uRotation, uRingGap;
+uniform float uFadeIn, uFadeOut;
+uniform float uMouseInfluence, uHoverAmount, uHoverScale, uParallax, uBurst;
+uniform vec2 uResolution, uMouse;
+uniform vec3 uColor, uColorTwo;
+uniform int uRingCount;
+
+const float HP = 1.5707963;
+const float CYCLE = 3.45;
+
+float fade(float t) {
+  return t < uFadeIn ? smoothstep(0.0, uFadeIn, t) : 1.0 - smoothstep(uFadeOut, CYCLE - 0.2, t);
+}
+
+float ring(vec2 p, float ri, float cut, float t0, float px) {
+  float t = mod(uTime + t0, CYCLE);
+  float r = ri + t / CYCLE * uScaleRate;
+  float d = abs(length(p) - r);
+  float a = atan(abs(p.y), abs(p.x)) / HP;
+  float th = max(1.0 - a, 0.5) * px * uLineThickness;
+  float h = (1.0 - smoothstep(th, th * 1.5, d)) + 1.0;
+  d += pow(cut * a, 3.0) * r;
+  return h * exp(-uAttenuation * d) * fade(t);
+}
+
+void main() {
+  float px = 1.0 / min(uResolution.x, uResolution.y);
+  vec2 p = (gl_FragCoord.xy - 0.5 * uResolution.xy) * px;
+  float cr = cos(uRotation), sr = sin(uRotation);
+  p = mat2(cr, -sr, sr, cr) * p;
+  p -= uMouse * uMouseInfluence;
+  float sc = mix(1.0, uHoverScale, uHoverAmount) + uBurst * 0.3;
+  p /= sc;
+  vec3 c = vec3(0.0);
+  float rcf = max(float(uRingCount) - 1.0, 1.0);
+  for (int i = 0; i < 10; i++) {
+    if (i >= uRingCount) break;
+    float fi = float(i);
+    vec2 pr = p - fi * uParallax * uMouse;
+    vec3 rc = mix(uColor, uColorTwo, fi / rcf);
+    c = mix(c, rc, vec3(ring(pr, uBaseRadius + fi * uRadiusStep, pow(uRingGap, fi), i == 0 ? 0.0 : 2.95 * fi, px)));
+  }
+  c *= 1.0 + uBurst * 2.0;
+  float n = fract(sin(dot(gl_FragCoord.xy + uTime * 100.0, vec2(12.9898, 78.233))) * 43758.5453);
+  c += (n - 0.5) * uNoiseAmount;
+  gl_FragColor = vec4(c, max(c.r, max(c.g, c.b)) * uOpacity);
+}
+`;
+
+      function compile(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+      }
+      const vs = compile(gl.VERTEX_SHADER, vertSrc);
+      const fs = compile(gl.FRAGMENT_SHADER, fragSrc);
+      if (!vs || !fs) { canvas.style.display = "none"; return; }
+      const prog = gl.createProgram();
+      gl.attachShader(prog, vs);
+      gl.attachShader(prog, fs);
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.style.display = "none"; return; }
+      gl.useProgram(prog);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      const aPos = gl.getAttribLocation(prog, "aPos");
+      gl.enableVertexAttribArray(aPos);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+      const U = {};
+      ["uTime", "uAttenuation", "uLineThickness", "uBaseRadius", "uRadiusStep", "uScaleRate",
+       "uOpacity", "uNoiseAmount", "uRotation", "uRingGap", "uFadeIn", "uFadeOut",
+       "uMouseInfluence", "uHoverAmount", "uHoverScale", "uParallax", "uBurst",
+       "uResolution", "uMouse", "uColor", "uColorTwo", "uRingCount"
+      ].forEach(n => { U[n] = gl.getUniformLocation(prog, n); });
+
+      gl.uniform1f(U.uAttenuation, P.attenuation);
+      gl.uniform1f(U.uLineThickness, P.lineThickness);
+      gl.uniform1f(U.uBaseRadius, P.baseRadius);
+      gl.uniform1f(U.uRadiusStep, P.radiusStep);
+      gl.uniform1f(U.uScaleRate, P.scaleRate);
+      gl.uniform1f(U.uOpacity, P.opacity);
+      gl.uniform1f(U.uNoiseAmount, P.noiseAmount);
+      gl.uniform1f(U.uRotation, (P.rotation * Math.PI) / 180);
+      gl.uniform1f(U.uRingGap, P.ringGap);
+      gl.uniform1f(U.uFadeIn, P.fadeIn);
+      gl.uniform1f(U.uFadeOut, P.fadeOut);
+      gl.uniform1f(U.uMouseInfluence, P.mouseInfluence);
+      gl.uniform1f(U.uHoverScale, P.hoverScale);
+      gl.uniform1f(U.uParallax, P.parallax);
+      gl.uniform3f(U.uColor, P.color[0], P.color[1], P.color[2]);
+      gl.uniform3f(U.uColorTwo, P.colorTwo[0], P.colorTwo[1], P.colorTwo[2]);
+      gl.uniform1i(U.uRingCount, P.ringCount);
+
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      gl.clearColor(0, 0, 0, 0);
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = visual.clientWidth * dpr;
+        canvas.height = visual.clientHeight * dpr;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform2f(U.uResolution, canvas.width, canvas.height);
+        if (reduceMotion) draw(1500);
+      }
+      new ResizeObserver(resize).observe(visual);
+
+      const mouse = [0, 0], smooth = [0, 0];
+      let hoverAmt = 0, isHover = false;
+      visual.addEventListener("mousemove", e => {
+        const r = visual.getBoundingClientRect();
+        mouse[0] = (e.clientX - r.left) / r.width - 0.5;
+        mouse[1] = -((e.clientY - r.top) / r.height - 0.5);
+      });
+      visual.addEventListener("mouseenter", () => { isHover = true; });
+      visual.addEventListener("mouseleave", () => { isHover = false; mouse[0] = 0; mouse[1] = 0; });
+
+      function draw(t) {
+        smooth[0] += (mouse[0] - smooth[0]) * 0.08;
+        smooth[1] += (mouse[1] - smooth[1]) * 0.08;
+        hoverAmt += ((isHover ? 1 : 0) - hoverAmt) * 0.08;
+        burst *= 0.95;
+        if (burst < 0.001) burst = 0;
+        gl.uniform1f(U.uTime, t * 0.001 * P.speed);
+        gl.uniform2f(U.uMouse, smooth[0], smooth[1]);
+        gl.uniform1f(U.uHoverAmount, hoverAmt);
+        gl.uniform1f(U.uBurst, burst);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      }
+
+      function loop(t) {
+        draw(t);
+        rafId = requestAnimationFrame(loop);
+      }
+      function startRings() {
+        if (glReady && rafId === null && !reduceMotion) rafId = requestAnimationFrame(loop);
+      }
+      function stopRings() {
+        if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+      }
+
+      glReady = true;
+      resize();
+      if (stageVisible) startRings();
     })();
 
     // ============================================================
