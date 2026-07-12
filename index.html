@@ -1277,7 +1277,7 @@
         </div>
         <div class="hscroll-track" id="proj-index"></div>
         <div class="wrap hscroll-foot">
-          <span class="hscroll-counter" id="proj-counter">01 / 07</span>
+          <span class="hscroll-counter" id="proj-counter">01 / 06</span>
           <span class="hscroll-bar"><span id="proj-bar"></span></span>
           <span class="sec-note">scroll →</span>
         </div>
@@ -1515,6 +1515,26 @@
     // ============================================================
     const projects = [
       {
+        title: "EV Engine — Earned Value Analysis",
+        category: "Data",
+        year: "2026",
+        description: "Enter control accounts with budget, dates, progress, and actual cost — get PV/EV/AC, CPI, SPI, cost and schedule variance, EAC forecast three ways, VAC and TCPI, plus the full S-curve chart and a per-activity performance table. The version of project truth nobody can argue with.",
+        tech: ["JavaScript", "Chart.js", "EVM"],
+        viz: "ev",
+        link: "earned-value.html",
+        image: "proj-ev.jpg"
+      },
+      {
+        title: "Field Dashboard — Construction Data Visualizer",
+        category: "Data",
+        year: "2026",
+        description: "Drop in any CSV or Excel export from a scheduling or cost system and get an instant project dashboard: budget-weighted completion, cost S-curve, CPI, budget vs actual by phase, a phase timeline, and a full task register. Columns are auto-detected and remappable, so it works with real-world exports, not just clean data. Fully client-side — sensitive project data never leaves the browser.",
+        tech: ["JavaScript", "Chart.js", "PapaParse", "SheetJS"],
+        viz: "dash",
+        link: "construction-dashboard.html",
+        image: "proj-dash.jpg"
+      },
+      {
         title: "Schedule Auditor — DCMA 14-Point XER Analyzer",
         category: "Planning",
         year: "2026",
@@ -1525,49 +1545,24 @@
         image: "proj-audit.jpg"
       },
       {
-        title: "Time-Chainage Creator",
-        category: "Planning",
-        year: "2026",
-        description: "Turns an activity list — chainages, dates, durations — into a clean time-chainage (time-location) diagram. Linear works slope across the alignment, fixed works hold their chainage as vertical bands, trades are color-coded, and the result exports as SVG or PNG for reports. Built for linear projects: roads, pipelines, rail.",
-        tech: ["JavaScript", "SVG", "Linear scheduling"],
-        viz: "chainage",
-        link: "time-chainage.html"
-      },
-      {
-        title: "EV Engine — Earned Value Analysis",
-        category: "Data",
-        year: "2026",
-        description: "Enter control accounts with budget, dates, progress, and actual cost — get PV/EV/AC, CPI, SPI, cost and schedule variance, EAC forecast three ways, VAC and TCPI, plus the full S-curve chart and a per-activity performance table. The version of project truth nobody can argue with.",
-        tech: ["JavaScript", "Chart.js", "EVM"],
-        viz: "ev",
-        link: "earned-value.html"
-      },
-      {
-        title: "Field Dashboard — Construction Data Visualizer",
-        category: "Data",
-        year: "2026",
-        description: "Drop in any CSV or Excel export from a scheduling or cost system and get an instant project dashboard: budget-weighted completion, cost S-curve, CPI, budget vs actual by phase, a phase timeline, and a full task register. Columns are auto-detected and remappable, so it works with real-world exports, not just clean data. Fully client-side — sensitive project data never leaves the browser.",
-        tech: ["JavaScript", "Chart.js", "PapaParse", "SheetJS"],
-        viz: "dash",
-        link: "construction-dashboard.html"
-      },
-      {
-        title: "Custom Schedule Log Checker",
-        category: "Planning",
-        year: "2025",
-        description: "Power Query tool that automatically detects every logical error in a construction program — open ends, broken logic, lag abuse — replicating the functionality of paid commercial schedule-checking software at zero cost. Adopted across the planning team as the standard pre-submission check, with training delivered to the team.",
-        tech: ["Power Query", "Excel"],
-        viz: "check",
-        link: null
-      },
-      {
         title: "Resource Loader",
         category: "Planning",
         year: "2025",
         description: "Productivity-driven tool that takes an activity list and productivity rates as inputs and outputs a fully resource-loaded schedule. Cut a 2-day manual loading process to under one hour.",
         tech: ["Excel", "VBA"],
         viz: "load",
-        link: null
+        link: null,
+        image: "proj-loader.jpg"
+      },
+      {
+        title: "Time-Chainage Creator",
+        category: "Planning",
+        year: "2026",
+        description: "Turns an activity list — chainages, dates, durations — into a clean time-chainage (time-location) diagram. Linear works slope across the alignment, fixed works hold their chainage as vertical bands, trades are color-coded, and the result exports as SVG or PNG for reports. Built for linear projects: roads, pipelines, rail.",
+        tech: ["JavaScript", "SVG", "Linear scheduling"],
+        viz: "chainage",
+        link: "time-chainage.html",
+        image: "proj-chainage.jpg"
       },
       {
         title: "Macro Suite",
@@ -1576,7 +1571,8 @@
         description: "A set of custom Excel macros that transform raw Primavera P6 schedule updates into visually structured management dashboards — from XER export to board-ready visuals without manual formatting.",
         tech: ["VBA", "Primavera P6"],
         viz: "macro",
-        link: null
+        link: null,
+        image: "proj-macro.jpg"
       }
     ];
 
@@ -1599,14 +1595,6 @@
         <circle cx="30" cy="30" r="2" fill="#ece7f8"/>
         <text x="60" y="18" font-family="IBM Plex Mono, monospace" font-size="10" fill="#38bdf8">42%</text>
         <text x="60" y="28" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#9b8ec4">EARNED</text>
-      </svg>`,
-      check: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
-        <line x1="2" y1="13" x2="88" y2="13" stroke="#241b38"/>
-        <line x1="2" y1="24" x2="88" y2="24" stroke="#241b38"/>
-        <text x="3" y="10" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#9b8ec4">A1020&#160;&#160;FS&#160;&#160;OK</text>
-        <text x="3" y="21" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#38bdf8">A1045&#160;&#160;!&#160;OPEN END</text>
-        <text x="3" y="32" font-family="IBM Plex Mono, monospace" font-size="6.5" fill="#9b8ec4">A1100&#160;&#160;FS&#160;&#160;OK</text>
-        <rect x="1" y="15" width="88" height="10" fill="#38bdf8" opacity="0.09"/>
       </svg>`,
       load: `<svg viewBox="0 0 90 36" xmlns="http://www.w3.org/2000/svg">
         <line x1="2" y1="32" x2="88" y2="32" stroke="#241b38"/>
