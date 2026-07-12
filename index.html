@@ -573,35 +573,114 @@
 
     .proj-viz { width: 90px; height: 36px; opacity: 0.7; transition: opacity 0.2s; }
     .proj-viz svg { width: 100%; height: 100%; display: block; }
-    .scroll-stack-card:hover .proj-viz { opacity: 1; }
+    .proj-slide:hover .proj-viz { opacity: 1; }
 
-    /* ================= PROJECTS — SCROLL STACK ================= */
-    /* ported from React Bits <ScrollStack/> (window-scroll variant) */
-    .scroll-stack-inner {
-      padding: 2vh 0 24rem;
+    /* ================= PROJECTS — HORIZONTAL SHOWCASE ================= */
+    /* vertical scroll drives the track sideways, one project at a time */
+    #projects { padding: 0; }
+
+    .hscroll { position: relative; }
+
+    /* fallback (mobile / reduced motion): native horizontal swipe */
+    .hscroll:not(.jack) { padding: 72px 0; }
+    .hscroll:not(.jack) .hscroll-track {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 16px;
     }
+    .hscroll:not(.jack) .proj-slide { scroll-snap-align: center; }
 
-    .scroll-stack-card {
-      position: relative;
-      height: 20rem;
-      width: 100%;
-      margin: 30px 0;
-      padding: 2.5rem 3rem;
-      box-sizing: border-box;
-      background: var(--paper);
-      border: 1px solid var(--line-strong);
-      border-radius: 8px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
-      transform-origin: top center;
-      will-change: transform;
-      backface-visibility: hidden;
+    .hscroll.jack .hscroll-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      justify-content: center;
+      overflow: hidden;
+      padding: 72px 0 20px; /* keep the section head clear of the fixed nav */
+      box-sizing: border-box;
+    }
+
+    .hscroll-sticky { display: flex; flex-direction: column; gap: 30px; }
+
+    .hscroll-track {
+      display: flex;
+      align-items: stretch;
+      gap: 28px;
+      padding-left: max(32px, calc((100vw - 1200px) / 2 + 32px));
+      padding-right: max(32px, calc((100vw - 1200px) / 2 + 32px));
+      will-change: transform;
+    }
+
+    .proj-slide {
+      flex: 0 0 auto;
+      width: min(720px, 78vw);
+      background: var(--paper-raise);
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      padding: 24px 28px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .proj-slide-img {
+      height: min(36vh, 330px);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      background: var(--paper);
+      margin-top: 4px;
+    }
+
+    .proj-slide-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .proj-slide-img.pending {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-style: dashed;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+    }
+
+    .hscroll-foot {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .hscroll-counter {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink);
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+    }
+
+    .hscroll-bar {
+      flex: 1;
+      height: 2px;
+      background: var(--line);
+      position: relative;
       overflow: hidden;
     }
 
-    .scroll-stack-end { width: 100%; height: 1px; }
+    .hscroll-bar span {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0%;
+      background: var(--accent);
+    }
 
     .stack-head {
       display: flex;
@@ -1020,10 +1099,10 @@
       .skills-grid { grid-template-columns: 1fr; }
       .ai-stage { grid-template-columns: 1fr; }
       .ai-visual { min-height: 300px; order: -1; }
-      .scroll-stack-card { height: auto; min-height: 18rem; padding: 1.5rem; }
+      .proj-slide { width: 86vw; padding: 1.2rem 1.4rem; }
       .stack-head .proj-viz { display: none; }
-      .stack-desc { -webkit-line-clamp: 6; }
-      .scroll-stack-inner { padding-bottom: 18rem; }
+      .stack-desc { -webkit-line-clamp: 5; }
+      .proj-slide-img { height: 30vh; }
       .stats { grid-template-columns: 1fr; }
       .approach { grid-template-columns: 1fr; gap: 40px; }
       section { padding: 72px 0; }
@@ -1186,14 +1265,23 @@
   </section>
 
   <section id="projects">
-    <div class="wrap">
-      <div class="sec-head">
-        <div>
-          <h2>Project <em class="serif">index</em></h2>
+    <div class="hscroll" id="proj-hscroll">
+      <div class="hscroll-sticky">
+        <div class="wrap">
+          <div class="sec-head">
+            <div>
+              <h2>Project <em class="serif">index</em></h2>
+            </div>
+            <p class="sec-note" id="proj-count">— entries on file</p>
+          </div>
         </div>
-        <p class="sec-note" id="proj-count">— entries on file</p>
+        <div class="hscroll-track" id="proj-index"></div>
+        <div class="wrap hscroll-foot">
+          <span class="hscroll-counter" id="proj-counter">01 / 07</span>
+          <span class="hscroll-bar"><span id="proj-bar"></span></span>
+          <span class="sec-note">scroll →</span>
+        </div>
       </div>
-      <div class="scroll-stack-inner" id="proj-index"></div>
     </div>
   </section>
 
@@ -1433,7 +1521,8 @@
         description: "Upload a Primavera P6 XER and get an instant DCMA 14-point assessment plus additional weakness checks — open logic, leads and lags, hard constraints, high and negative float, invalid dates, SF relationships, duplicate activities, actual-date consistency. Every failed check lists the exact offending activities, exportable to CSV. Reads the XER's own CPM results, fully client-side, and honest about its limits: checks that can't be automated from a static file are flagged for manual review, not faked.",
         tech: ["JavaScript", "XER parsing", "DCMA 14-point"],
         viz: "audit",
-        link: "schedule-auditor.html"
+        link: "schedule-auditor.html",
+        image: "proj-audit.jpg"
       },
       {
         title: "Time-Chainage Creator",
@@ -1560,7 +1649,7 @@
     const idx = document.getElementById("proj-index");
     projects.forEach((p, i) => {
       const card = document.createElement("div");
-      card.className = "scroll-stack-card";
+      card.className = "proj-slide";
       card.innerHTML = `
         <div class="stack-head">
           <span class="proj-id">${String(i + 1).padStart(3, "0")}</span>
@@ -1570,6 +1659,9 @@
         </div>
         <h3 class="stack-title">${p.title}</h3>
         <p class="stack-desc">${p.description}</p>
+        ${p.image
+          ? `<div class="proj-slide-img"><img src="${p.image}" alt="${p.title} — screenshot" loading="lazy"></div>`
+          : `<div class="proj-slide-img pending"><span>VISUAL — TO FOLLOW</span></div>`}
         <div class="stack-foot">
           <div class="proj-tags">${p.tech.map(t => `<span class="tag">${t}</span>`).join("")}</div>
           ${p.link ? `<a class="proj-link" href="${p.link}" target="_blank" rel="noopener">View project ↗</a>` : ""}
@@ -1577,93 +1669,71 @@
       `;
       idx.appendChild(card);
     });
-    idx.insertAdjacentHTML("beforeend", '<div class="scroll-stack-end"></div>');
 
     // ============================================================
-    // SCROLL STACK — vanilla port of React Bits <ScrollStack/>
-    // (window-scroll variant, native scrolling instead of Lenis)
+    // PROJECTS — horizontal scroll showcase
+    // (sticky viewport; vertical scroll drives the track sideways)
     // ============================================================
     (function () {
-      const cards = Array.from(document.querySelectorAll(".scroll-stack-card"));
-      const endEl = document.querySelector(".scroll-stack-end");
-      if (!cards.length || !endEl) return;
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const hs = document.getElementById("proj-hscroll");
+      const track = document.getElementById("proj-index");
+      if (!hs || !track) return;
+      const counter = document.getElementById("proj-counter");
+      const bar = document.getElementById("proj-bar");
+      const total = track.querySelectorAll(".proj-slide").length;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const pad = n => String(n).padStart(2, "0");
 
-      const itemDistance = 100;
-      const itemScale = 0.03;
-      const itemStackDistance = 30;
-      const stackPositionPct = 0.20;
-      const scaleEndPct = 0.10;
-      const baseScale = 0.85;
+      let active = false, maxX = 0, hsTop = 0;
 
-      const lastTransforms = new Map();
-
-      cards.forEach((card, i) => {
-        if (i < cards.length - 1) card.style.marginBottom = itemDistance + "px";
-      });
-
-      // layout offset from document top — unaffected by the transforms we apply
-      function docTop(el) {
-        let t = 0;
-        while (el) { t += el.offsetTop; el = el.offsetParent; }
-        return t;
+      function setMeter(p) {
+        const i = Math.min(total - 1, Math.round(p * (total - 1)));
+        counter.textContent = pad(i + 1) + " / " + pad(total);
+        bar.style.width = (p * 100).toFixed(2) + "%";
       }
 
-      function progress(v, a, b) {
-        return v < a ? 0 : v > b ? 1 : (v - a) / (b - a);
+      function measure() {
+        const shouldJack = window.innerWidth > 820 && !reduceMotion;
+        if (shouldJack !== active) {
+          active = shouldJack;
+          hs.classList.toggle("jack", active);
+          if (!active) { hs.style.height = ""; track.style.transform = ""; }
+        }
+        if (!active) return;
+        maxX = Math.max(0, track.scrollWidth - window.innerWidth);
+        hs.style.height = (window.innerHeight + maxX) + "px";
+        hsTop = 0;
+        let el = hs;
+        while (el) { hsTop += el.offsetTop; el = el.offsetParent; }
+        update();
       }
 
       function update() {
-        const scrollTop = window.scrollY;
-        const vh = window.innerHeight;
-        const stackPos = vh * stackPositionPct;
-        const scaleEnd = vh * scaleEndPct;
-        const endTop = docTop(endEl);
-        const tops = cards.map(docTop);
-
-        cards.forEach((card, i) => {
-          const cardTop = tops[i];
-          const triggerStart = cardTop - stackPos - itemStackDistance * i;
-          const triggerEnd = cardTop - scaleEnd;
-          const pinStart = triggerStart;
-          const pinEnd = endTop - vh / 2;
-
-          const scaleProgress = progress(scrollTop, triggerStart, triggerEnd);
-          const targetScale = baseScale + i * itemScale;
-          const scale = 1 - scaleProgress * (1 - targetScale);
-
-          let translateY = 0;
-          if (scrollTop >= pinStart && scrollTop <= pinEnd) {
-            translateY = scrollTop - cardTop + stackPos + itemStackDistance * i;
-          } else if (scrollTop > pinEnd) {
-            translateY = pinEnd - cardTop + stackPos + itemStackDistance * i;
-          }
-
-          const next = {
-            translateY: Math.round(translateY * 100) / 100,
-            scale: Math.round(scale * 1000) / 1000
-          };
-          const prev = lastTransforms.get(i);
-          if (!prev || Math.abs(prev.translateY - next.translateY) > 0.1 ||
-              Math.abs(prev.scale - next.scale) > 0.001) {
-            card.style.transform =
-              "translate3d(0, " + next.translateY + "px, 0) scale(" + next.scale + ")";
-            lastTransforms.set(i, next);
-          }
-        });
+        if (!active || maxX === 0) return;
+        const p = Math.min(1, Math.max(0, (window.scrollY - hsTop) / maxX));
+        track.style.transform = "translate3d(" + (-p * maxX).toFixed(2) + "px,0,0)";
+        setMeter(p);
       }
 
       let ticking = false;
-      function onScroll() {
+      window.addEventListener("scroll", () => {
         if (ticking) return;
         ticking = true;
         requestAnimationFrame(() => { update(); ticking = false; });
-      }
+      }, { passive: true });
 
-      window.addEventListener("scroll", onScroll, { passive: true });
-      window.addEventListener("resize", onScroll);
-      window.addEventListener("load", update);
-      update();
+      // fallback mode: meter follows the track's native horizontal scroll
+      track.addEventListener("scroll", () => {
+        if (active) return;
+        const m = track.scrollWidth - track.clientWidth;
+        if (m > 0) setMeter(track.scrollLeft / m);
+      }, { passive: true });
+
+      let rt;
+      window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(measure, 120); });
+      window.addEventListener("load", measure);
+      measure();
+      setMeter(0);
     })();
 
     // Counters
